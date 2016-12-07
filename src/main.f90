@@ -35,11 +35,11 @@ PROGRAM ShallowWaters
 
   !Inicializamos variables
   cellsize = 1.0_dp
-  cellnumber = 50
+  cellnumber = 20
   boxsize = cellnumber*cellsize
-  nt = 20
+  nt = 50
   tf = 1000.0_dp
-  dt = tf/nt
+  dt = 0.1_dp!tf/nt
   tt = 0.0_dp
   ho = 0.1_dp
   name = "resultado"
@@ -52,7 +52,8 @@ PROGRAM ShallowWaters
   ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber), U%vv(cellnumber, cellnumber))
   U%hh = ho
   ! Agua elevada en la esquina
-  U%hh(1:10,cellnumber-10+1:cellnumber)=1.0_dp;
+  !U%hh(1:10,cellnumber-10+1:cellnumber)=1.0_dp;
+  U%hh(1:4,1:4)=1.0_dp;
   U%uu = 0.0_dp
   U%vv = 0.0_dp
   ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
@@ -60,6 +61,7 @@ PROGRAM ShallowWaters
   GG = 0.0_dp
   CALL plot_results(U%hh, xx, yy, name, 0)
   DO tstep = 1,nt
+      PRINT *, "Procesando paso temporal: ", tstep
       CALL fluxes(U, cellnumber, FF, GG, amax)
       CALL corrector(U, FF,GG,cellnumber,dt/cellsize)
       CALL plot_results(U%hh, xx, yy, name, tstep)
