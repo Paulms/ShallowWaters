@@ -29,9 +29,11 @@ PROGRAM ShallowWaters
   REAL(kind = dp)                 :: ho             !profundidad inicial
   REAL(kind = dp), ALLOCATABLE    :: FF(:,:,:), GG(:,:,:)        !Flujos
   TYPE(SWSolution)                :: U              !solucion
-  INTEGER                         :: tstep, i
+  INTEGER                         :: tstep, i, j, center    !iteradores
   CHARACTER(LEN=32)               :: name
   REAL(kind = dp)                 :: amax
+  INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
+  REAL(kind = dp), ALLOCATABLE    :: drop(:,:)      ! gota
 
   !Inicializamos variables
   cellsize = 1.0_dp
@@ -44,6 +46,7 @@ PROGRAM ShallowWaters
   ho = 0.1_dp
   name = "resultado"
   amax = 0.0_dp
+  ejemplo = 2
   ALLOCATE(xx(cellnumber-1), yy(cellnumber-1))
   ! Inicializamos malla
   xx = (/(i*cellsize/2,i=1,cellnumber-1)/)
@@ -51,9 +54,27 @@ PROGRAM ShallowWaters
   ! Condiciones Iniciales
   ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber), U%vv(cellnumber, cellnumber))
   U%hh = ho
-  ! Agua elevada en la esquina
-  !U%hh(1:10,cellnumber-10+1:cellnumber)=1.0_dp;
-  U%hh(1:4,1:4)=1.0_dp;
+  SELECT CASE (ejemplo)
+  CASE (1)
+    ! Agua elevada en la esquina
+    !U%hh(1:10,cellnumber-10+1:cellnumber)=1.0_dp;
+    U%hh(1:4,1:4)=1.0_dp;
+  CASE (2)
+    ! Gota de Agua
+    ALLOCATE(drop(5,5))
+    DO i = 1,5
+      drop(i,:) = (/(2*exp(-0.25*((i-3)**2+j**2)), j = -2, 2)/)
+    END DO
+    center = INT(cellnumber/2)
+    U%hh((center-2):(center+2),(center-2):(center+2)) = &
+    U%hh((center-2):(center+2),(center-2):(center+2)) + drop
+    DEALLOCATE(drop)
+  CASE default
+    print *, "Ejemplo no implementado"
+    STOP
+  END SELECT
+
+
   U%uu = 0.0_dp
   U%vv = 0.0_dp
   ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
