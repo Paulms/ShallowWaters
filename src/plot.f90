@@ -49,7 +49,8 @@ CONTAINS
     WRITE(iunit1,'(A)') 'Profundidad calculada con SWSolver'
     WRITE(iunit1,'(A)') 'ASCII'
     !
-    WRITE(iunit1,'(A)')'DATASET UNSTRUCTURED_GRID'
+    WRITE(iunit1,'(A)')'DATASET STRUCTURED_GRID'
+    WRITE(iunit1,'(A,1x,i12,1x,i12,1x,i12)')'DIMENSIONS',size(x,1), size(y,1), 1
     !
     ! Los nodos:
     !

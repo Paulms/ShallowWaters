@@ -7,4 +7,4 @@ MODULE tipos
     REAL(kind = dp), ALLOCATABLE    :: uu(:,:)        !velocidad en x
     REAL(kind = dp), ALLOCATABLE    :: vv(:,:)        !velocidad en y
   END TYPE
-END MODULE tipo
+END MODULE tipos

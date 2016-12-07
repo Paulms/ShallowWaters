@@ -1,6 +1,7 @@
 MODULE util
   use decimal
 IMPLICIT NONE
+CONTAINS
   SUBROUTINE util_get_unit (iunit)
     !
     !*******************************************************************************
@@ -33,7 +34,6 @@ IMPLICIT NONE
     !    free FORTRAN unit.  Note that GET_UNIT assumes that units 5 and 6
     !    are special, and will never return those values.
     !
-    IMPLICIT NONE
     !
     INTEGER i, ios, iunit
     LOGICAL lopen
