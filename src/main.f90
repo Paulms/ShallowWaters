@@ -45,7 +45,10 @@ PROGRAM ShallowWaters
   ! Leemos variables desde archivo
   CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims, ejemplo)
   ! Ajustamos las dimensiones para los ejemplos predeterminados
-  IF (ejemplo>0) THEN
+  IF (ejemplo == 1) THEN
+    dims = 1
+  END IF
+  IF (ejemplo>1) THEN
     dims = 2
   END IF
 
@@ -57,10 +60,10 @@ PROGRAM ShallowWaters
   SELECT CASE (dims)
   CASE (1)
     ALLOCATE(U%hh(cellnumber, 1), U%uu(cellnumber, 1, 1))
-    ALLOCATE(FF(cellnumber+1,1,dims+1),GG(1, cellnumber+1,dims+1))
+    ALLOCATE(FF(cellnumber+1,1,3),GG(1, cellnumber+1,3))
   CASE (2)
     ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
-    ALLOCATE(FF(cellnumber+1,cellnumber,dims+1),GG(cellnumber, cellnumber+1,dims+1))
+    ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
   CASE default
     print *, "Dimensiones incorrectas, seleccionar 1 o 2"
     STOP
@@ -92,7 +95,7 @@ PROGRAM ShallowWaters
   DO tstep = 1,nt
       PRINT *, "Procesando paso temporal: ", tstep
       CALL fluxes(U, cellnumber, FF, GG, amax)
-        PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
+      PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,cellnumber,dt/cellsize)
       CALL plot_results(U, xx, name, tstep)
   END DO

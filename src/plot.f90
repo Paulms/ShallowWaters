@@ -138,7 +138,7 @@ CONTAINS
     WRITE(iunit1,'(A,1x,i12,1x,A)')'POINTS',nod,'float'
     !
     DO i = 1,size(x,1)
-      WRITE(iunit1,'(3(E30.15,2x))') x(j),0.0,0.0
+      WRITE(iunit1,'(3(E30.15,2x))') x(i),0.0,0.0
     END DO
     !
     ! Las variables calculadas:
