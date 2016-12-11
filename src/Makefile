@@ -12,13 +12,15 @@ RiemannSolvers.o: ./RiemannSolvers.f90 decimal.o tipos.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./RiemannSolvers.f90
 correctors.o: ./correctors.f90 decimal.o tipos.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./correctors.f90
+datos.o: ./datos.f90 decimal.o util.o
+	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./datos.f90
 decimal.o: ./decimal.f90
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./decimal.f90
 fluxes.o: ./fluxes.f90 decimal.o tipos.o RiemannSolvers.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./fluxes.f90
 funciones.o: ./funciones.f90 decimal.o tipos.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./funciones.f90
-main.o: ./main.f90 decimal.o fluxes.o tipos.o correctors.o plot.o funciones.o
+main.o: ./main.f90 decimal.o fluxes.o tipos.o correctors.o plot.o funciones.o datos.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./main.f90
 plot.o: ./plot.f90 decimal.o tipos.o util.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./plot.f90
@@ -26,8 +28,8 @@ tipos.o: ./tipos.f90 decimal.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./tipos.f90
 util.o: ./util.f90 decimal.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./util.f90
-SRC = ./main.f90 ./correctors.f90 ./RiemannSolvers.f90 ./tipos.f90 ./fluxes.f90 ./funciones.f90 ./decimal.f90 ./util.f90 ./plot.f90
-OBJ = main.o correctors.o RiemannSolvers.o tipos.o fluxes.o funciones.o decimal.o util.o plot.o
+SRC = ./datos.f90 ./fluxes.f90 ./correctors.f90 ./util.f90 ./RiemannSolvers.f90 ./plot.f90 ./main.f90 ./funciones.f90 ./decimal.f90 ./tipos.f90
+OBJ = datos.o fluxes.o correctors.o util.o RiemannSolvers.o plot.o main.o funciones.o decimal.o tipos.o
 clean: neat
 	-rm -f .../bin/SWSolver.cppdefs $(OBJ) ../bin/SWSolver
 neat:
