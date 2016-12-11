@@ -8,7 +8,9 @@ PROGRAM ShallowWaters
   !! e-mail: paul.mendez@udec.cl                          !!
   !! Fecha: 6/Diciembre/2016                              !!
   !!                                                      !!
-  !! Version: 0.1                                         !!   
+  !! Version: 0.1                                         !!  
+  !! Version 0.2: 8/Dic/2016 modulo funciones             !!
+  !! Version 0.3: 11/Dic/2016 Problemas 1D                !!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   USE decimal               ! Define la precisión
   USE SWFluxes
@@ -68,6 +70,7 @@ PROGRAM ShallowWaters
     print *, "Dimensiones incorrectas, seleccionar 1 o 2"
     STOP
   END SELECT
+  
   ! Condiciones Iniciales
   U%dims = dims
   U%hh = 0.0_dp;   U%uu = 0.0_dp
