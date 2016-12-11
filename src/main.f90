@@ -57,8 +57,10 @@ PROGRAM ShallowWaters
   SELECT CASE (dims)
   CASE (1)
     ALLOCATE(U%hh(cellnumber, 1), U%uu(cellnumber, 1, 1))
+    ALLOCATE(FF(cellnumber+1,1,dims+1),GG(1, cellnumber+1,dims+1))
   CASE (2)
     ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
+    ALLOCATE(FF(cellnumber+1,cellnumber,dims+1),GG(cellnumber, cellnumber+1,dims+1))
   CASE default
     print *, "Dimensiones incorrectas, seleccionar 1 o 2"
     STOP
@@ -82,7 +84,6 @@ PROGRAM ShallowWaters
     STOP
   END SELECT
   ! Inicializamos velocidades
-  ALLOCATE(FF(cellnumber+1,cellnumber,dims+1),GG(cellnumber, cellnumber+1,dims+1))
   FF = 0.0_dp
   GG = 0.0_dp
   ! Guardamos condicion inicial
