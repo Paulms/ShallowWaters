@@ -73,7 +73,6 @@ PROGRAM ShallowWaters
     CALL initial_h(U)
   CASE (1)
     ! Agua elevada en la esquina
-    !U%hh(1:10,cellnumber-10+1:cellnumber)=1.0_dp;
     CALL initial_h_ejemplo1(U)
   CASE (2)
     ! Gota de Agua (Gaussiana)
@@ -92,10 +91,10 @@ PROGRAM ShallowWaters
   DO tstep = 1,nt
       PRINT *, "Procesando paso temporal: ", tstep
       CALL fluxes(U, cellnumber, FF, GG, amax)
+        PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,cellnumber,dt/cellsize)
       CALL plot_results(U%hh, xx, yy, name, tstep)
   END DO
-  PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
   ! Liberamos memoria
   DEALLOCATE(FF,GG, U%hh, U%uu)
 END PROGRAM ShallowWaters
