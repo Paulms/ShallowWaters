@@ -15,6 +15,7 @@ PROGRAM ShallowWaters
   USE Tipos
   USE correctors
   USE plot
+  USE funciones
 
   IMPLICIT NONE
   ! Definimos variables a utilizar
@@ -26,14 +27,12 @@ PROGRAM ShallowWaters
   REAL(kind =dp)                  :: dt             !paso temporal
   REAL(kind = dp)                 :: tt             !tiempo
   REAL(kind = dp), ALLOCATABLE    :: xx(:), yy(:)   !malla
-  REAL(kind = dp)                 :: ho             !profundidad inicial
   REAL(kind = dp), ALLOCATABLE    :: FF(:,:,:), GG(:,:,:)        !Flujos
   TYPE(SWSolution)                :: U              !solucion
   INTEGER                         :: tstep, i, j, center    !iteradores
   CHARACTER(LEN=32)               :: name
   REAL(kind = dp)                 :: amax
   INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
-  REAL(kind = dp), ALLOCATABLE    :: drop(:,:)      ! gota
 
   !Inicializamos variables
   cellsize = 1.0_dp
@@ -43,7 +42,6 @@ PROGRAM ShallowWaters
   tf = 1000.0_dp
   dt = 0.1_dp!tf/nt
   tt = 0.0_dp
-  ho = 0.1_dp
   name = "resultado"
   amax = 0.0_dp
   ejemplo = 2
@@ -53,30 +51,22 @@ PROGRAM ShallowWaters
   yy = xx
   ! Condiciones Iniciales
   ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber), U%vv(cellnumber, cellnumber))
-  U%hh = ho
+  U%hh = 0.0_dp;   U%uu = 0.0_dp;  U%vv = 0.0_dp
   SELECT CASE (ejemplo)
+  CASE (0)
+    ! Ejemplo definido por el usuario
+    CALL initial_h(U)
   CASE (1)
     ! Agua elevada en la esquina
     !U%hh(1:10,cellnumber-10+1:cellnumber)=1.0_dp;
-    U%hh(1:4,1:4)=1.0_dp;
+    CALL initial_h_ejemplo1(U)
   CASE (2)
-    ! Gota de Agua
-    ALLOCATE(drop(5,5))
-    DO i = 1,5
-      drop(i,:) = (/(2*exp(-0.25*((i-3)**2+j**2)), j = -2, 2)/)
-    END DO
-    center = INT(cellnumber/2)
-    U%hh((center-2):(center+2),(center-2):(center+2)) = &
-    U%hh((center-2):(center+2),(center-2):(center+2)) + drop
-    DEALLOCATE(drop)
+    ! Gota de Agua (Gaussiana)
+    CALL initial_h_ejemplo2(U) 
   CASE default
     print *, "Ejemplo no implementado"
     STOP
   END SELECT
-
-
-  U%uu = 0.0_dp
-  U%vv = 0.0_dp
   ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
   FF = 0.0_dp
   GG = 0.0_dp
