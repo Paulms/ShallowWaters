@@ -21,14 +21,17 @@ CONTAINS
     normal = [0.0_dp, 1.0_dp]
     amax = 0.0_dp
     DO j = 2,cellnumber
-        DO k = 1, cellnumber
+        inner: DO k = 1, cellnumber
             hl=UU%hh(j-1,k)
             hr=UU%hh(j,k)
             ul=UU%uu(j-1,k,1)
             ur=UU%uu(j,k,1)
             CALL solver(hl,hr,ul,ur,vl,vr,normal, FF(j,k,:), a)
             amax=max(a,amax);
-        END DO
+            IF (UU%dims == 1) THEN
+                EXIT inner
+            END IF
+        END DO inner
     END DO
     ! Condiciones de borde de la pared izquierda de la caja
     DO k=1,cellnumber
@@ -36,6 +39,9 @@ CONTAINS
         ur=UU%uu(1,k,1)
         CALL solver(hr,hr,-ur,ur,vr,vr,normal, FF(1,k,:), a)
         amax=max(a,amax);
+        IF (UU%dims == 1) THEN
+            EXIT
+        END IF
     END DO
     ! Condiciones de borde de la pared derecha de la caja
     DO k=1,cellnumber
@@ -43,6 +49,9 @@ CONTAINS
         ul=UU%uu(cellnumber,k,1)
         CALL solver(hl,hl,ul,-ul,vl,vl,normal, FF(cellnumber+1,k,:), a)
         amax=max(a,amax);
+        IF (UU%dims == 1) THEN
+            EXIT
+        END IF
     END DO
 
     ! Calculamos flujos en la direccion y

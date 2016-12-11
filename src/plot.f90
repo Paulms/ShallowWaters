@@ -8,10 +8,11 @@ MODULE plot
   USE tipos
   USE util
 CONTAINS
-  SUBROUTINE plot_results(malla,x,y,nameb, iteracion)
+  SUBROUTINE plot_results(U,x,nameb, iteracion)
     !
     ! Subrutina que genera archivos para la visualizacion
-    REAL(KIND=dp),INTENT(IN)     :: malla(:,:), x(:), y(:)
+    TYPE(SWSolution)                :: U
+    REAL(KIND=dp),INTENT(IN)     :: x(:)
     CHARACTER(LEN=*),INTENT(IN)  :: nameb
     CHARACTER(LEN=32)             :: name
     INTEGER                      :: iteracion
@@ -22,16 +23,24 @@ CONTAINS
 
     ! Usando Paraview para visualizar los resultados
     !
-    CALL plot_paraview(name,malla,x,y)
+    SELECT CASE (U%dims)
+    CASE (1)
+      CALL plot_paraview1D(name,U,x)
+    case (2)
+      CALL plot_paraview2D(name,U,x,x)
+    CASE default
+      print *,"Numero de dimensiones incorrecto"
+      STOP
+    END SELECt
 
   END SUBROUTINE plot_results
 
-  SUBROUTINE plot_paraview(name,malla,x,y)
+  SUBROUTINE plot_paraview2D(name,U,x, y)
     !
     ! subrutina que imprime la malla y el resultado usando
     ! el visualizador PARAVIEW
-
-    REAL(KIND=dp),INTENT(IN)     :: malla(:,:), x(:), y(:)
+    TYPE(SWSolution)             :: U
+    REAL(KIND=dp),INTENT(IN)     :: x(:), y(:)
     CHARACTER(LEN=*),INTENT(IN)  :: name
     CHARACTER(LEN=32)            :: name_dat
     INTEGER                      :: i,j,nod,iunit1,cell_type
@@ -74,12 +83,83 @@ CONTAINS
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') malla(j,i)
+        WRITE(iunit1,'(E30.15)') U%hh(j,i)
       END DO
     END DO
     !
+    WRITE(iunit1,'(A)')'SCALARS VelocidadX float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+      DO i = 1,size(y,1)
+        WRITE(iunit1,'(E30.15)') U%uu(j,i,1)
+      END DO
+    END DO
+    !
+    WRITE(iunit1,'(A)')'SCALARS VelocidadY float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+      DO i = 1,size(y,1)
+        WRITE(iunit1,'(E30.15)') U%uu(j,i,2)
+      END DO
+    END DO
     CLOSE(iunit1)
     !
-  END SUBROUTINE plot_paraview
+  END SUBROUTINE plot_paraview2D
+
+  SUBROUTINE plot_paraview1D(name,U,x)
+    !
+    ! subrutina que imprime la malla y el resultado usando
+    ! el visualizador PARAVIEW
+    TYPE(SWSolution)             :: U
+    REAL(KIND=dp),INTENT(IN)     :: x(:)
+    CHARACTER(LEN=*),INTENT(IN)  :: name
+    CHARACTER(LEN=32)            :: name_dat
+    INTEGER                      :: i,j,nod,iunit1,cell_type
+    !
+    name_dat = TRIM(ADJUSTL(name))//".vtk"  
+    !
+    CALL util_get_unit(iunit1)
+    OPEN(iunit1,file=name_dat,   status='replace', action='write' )
+    !
+    ! creacion del archivo .vtk
+    !
+    !
+    !
+    WRITE(iunit1,'(A)') '# vtk DataFile Version 2.0'
+    WRITE(iunit1,'(A)') 'Profundidad calculada con SWSolver'
+    WRITE(iunit1,'(A)') 'ASCII'
+    !
+    WRITE(iunit1,'(A)')'DATASET STRUCTURED_GRID'
+    WRITE(iunit1,'(A,1x,i12,1x,i12,1x,i12)')'DIMENSIONS',size(x,1), 1, 1
+    !
+    ! Los nodos:
+    !
+    nod = size(x,1)
+    WRITE(iunit1,'(A,1x,i12,1x,A)')'POINTS',nod,'float'
+    !
+    DO i = 1,size(x,1)
+      WRITE(iunit1,'(3(E30.15,2x))') x(j),0.0,0.0
+    END DO
+    !
+    ! Las variables calculadas:
+    !
+    WRITE(iunit1,'(A)') 
+    WRITE(iunit1,'(A,1x,i12)')'POINT_DATA', nod
+    !
+    ! Solucion discreta:
+    !
+    WRITE(iunit1,'(A)')'SCALARS Profundidad float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+        WRITE(iunit1,'(E30.15)') U%hh(j,1)
+    END DO
+    !
+    WRITE(iunit1,'(A)')'SCALARS VelocidadX float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+        WRITE(iunit1,'(E30.15)') U%uu(j,1,1)
+    END DO
+    !
+  END SUBROUTINE plot_paraview1D
 
 END MODULE plot
