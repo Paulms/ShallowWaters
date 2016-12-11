@@ -32,26 +32,41 @@ PROGRAM ShallowWaters
   INTEGER                         :: tstep, i, j, center    !iteradores
   CHARACTER(LEN=32)               :: name
   REAL(kind = dp)                 :: amax
+  INTEGER                         :: dims           ! dimensiones del problema
   INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
   CHARACTER(32)                   :: file_input_name ! Archivo para leer datos
 
   ! Inicializamos las variables
   cellsize = 0.0_dp; cellnumber = 0
   nt = 0; tf = 0.0_dp; tt = 0.0_dp
-  amax = 0.0_dp; ejemplo = 1
+  amax = 0.0_dp; ejemplo = 1; dims = 0
   file_input_name = "input.dat"
 
   ! Leemos variables desde archivo
-  CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, ejemplo)
+  CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims, ejemplo)
+  ! Ajustamos las dimensiones para los ejemplos predeterminados
+  IF (ejemplo>0) THEN
+    dims = 2
+  END IF
+  ! Chequeamos que los datos de entrada sean correctos
+  IF (dims < 1 .OR. dims > 2) THEN
+    print *, "Dimensiones incorrectas, seleccionar 1 o 2"
+    STOP
+  END IF
 
   ! Creamos una malla uniforme
-  ALLOCATE(xx(cellnumber-1), yy(cellnumber-1))
+  ALLOCATE(xx(cellnumber-1))
   xx = (/(i*cellsize/2,i=1,cellnumber-1)/)
-  yy = xx
+  IF (dims == 2) THEN
+    ALLOCATE(yy(cellnumber-1))
+    yy = xx
+  END IF
 
   ! Condiciones Iniciales
-  ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber), U%vv(cellnumber, cellnumber))
-  U%hh = 0.0_dp;   U%uu = 0.0_dp;  U%vv = 0.0_dp
+  ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
+  U%dims = dims
+  U%hh = 0.0_dp;   U%uu = 0.0_dp
+  
   SELECT CASE (ejemplo)
   CASE (0)
     ! Ejemplo definido por el usuario
@@ -68,7 +83,7 @@ PROGRAM ShallowWaters
     STOP
   END SELECT
   ! Inicializamos velocidades
-  ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
+  ALLOCATE(FF(cellnumber+1,cellnumber,dims+1),GG(cellnumber, cellnumber+1,dims+1))
   FF = 0.0_dp
   GG = 0.0_dp
   ! Guardamos condicion inicial
@@ -82,5 +97,5 @@ PROGRAM ShallowWaters
   END DO
   PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
   ! Liberamos memoria
-  DEALLOCATE(FF,GG, U%hh, U%uu,U%vv)
+  DEALLOCATE(FF,GG, U%hh, U%uu)
 END PROGRAM ShallowWaters

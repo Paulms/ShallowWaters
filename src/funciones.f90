@@ -33,7 +33,7 @@ CONTAINS
     DO i = 1,5
       drop(i,:) = (/(2*exp(-0.25*((i-3)**2+j**2)), j = -2, 2)/)
     END DO
-    center = INT(SIZE(U%hh)/2)
+    center = INT(SIZE(U%hh,1)/2)
     U%hh((center-2):(center+2),(center-2):(center+2)) = &
     U%hh((center-2):(center+2),(center-2):(center+2)) + drop
     DEALLOCATE(drop)
