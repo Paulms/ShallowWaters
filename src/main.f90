@@ -56,7 +56,7 @@ PROGRAM ShallowWaters
 
   ! Creamos una malla uniforme
   ALLOCATE(xx(cellnumber-1))
-  xx = (/(i*cellsize/2,i=1,cellnumber-1)/)
+  xx = (/(i*cellsize,i=1,cellnumber-1)/)
 
   ! Ajustamos problema a las dimensiones
   SELECT CASE (dims)
