@@ -30,6 +30,7 @@ PROGRAM ShallowWaters
   REAL(kind = dp)                 :: tt             !tiempo
   REAL(kind = dp), ALLOCATABLE    :: xx(:)          !malla
   REAL(kind = dp), ALLOCATABLE    :: FF(:,:,:), GG(:,:,:)        !Flujos
+  REAL(kind = dp), ALLOCATABLE    :: bed(:,:)       ! lecho
   TYPE(SWSolution)                :: U              !solucion
   INTEGER                         :: tstep, i, j, center    !iteradores
   CHARACTER(LEN=32)               :: name
@@ -62,9 +63,11 @@ PROGRAM ShallowWaters
   SELECT CASE (dims)
   CASE (1)
     ALLOCATE(U%hh(cellnumber, 1), U%uu(cellnumber, 1, 1))
+    ALLOCATE(bed(cellnumber, 1))
     ALLOCATE(FF(cellnumber+1,1,3),GG(1, cellnumber+1,3))
   CASE (2)
     ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
+    ALLOCATE(bed(cellnumber, cellnumber))
     ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
   CASE default
     print *, "Dimensiones incorrectas, seleccionar 1 o 2"
@@ -73,7 +76,9 @@ PROGRAM ShallowWaters
   
   ! Condiciones Iniciales
   U%dims = dims
-  U%hh = 0.0_dp;   U%uu = 0.0_dp
+  U%hh = 0.0_dp;   U%uu = 0.0_dp; bed = 0.0_dp
+
+  CALL initial_bed(bed)
   
   SELECT CASE (ejemplo)
   CASE (0)

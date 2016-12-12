@@ -3,6 +3,12 @@ use decimal
 use tipos
 IMPLICIT NONE
 CONTAINS
+  SUBROUTINE initial_h(bed)
+    ! Editar esta función para imponer
+    ! una condición al lecho del sistema
+    REAL(kind=dp)                :: bed(:,:) 
+    bed = 0.0_dp
+  END SUBROUTINE
   SUBROUTINE initial_h(U)
     ! Editar esta función para imponer
     ! una condición inicial al sistema
