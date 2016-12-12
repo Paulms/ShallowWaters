@@ -77,9 +77,9 @@ PROGRAM ShallowWaters
   ! Condiciones Iniciales
   U%dims = dims
   U%hh = 0.0_dp;   U%uu = 0.0_dp; bed = 0.0_dp
-
+  ! Inicializamos el lecho del sistema
   CALL initial_bed(bed)
-  
+  ! Inicializamos la altura del agua
   SELECT CASE (ejemplo)
   CASE (0)
     ! Ejemplo definido por el usuario
@@ -97,6 +97,12 @@ PROGRAM ShallowWaters
   ! Inicializamos velocidades
   FF = 0.0_dp
   GG = 0.0_dp
+
+  ! Calculamos las pendientes del lecho:
+  for i=1:nc,
+    dz(i)=z(i+1)-z(i); %dimensions of length
+    zc(i)=0.5d0*(z(i+1)+z(i)); %elevation of cell center
+end
   ! Guardamos condicion inicial
   CALL plot_results(U, xx, name, 0)
   ! Calculamos estado del sistema en cada paso de tiempo
