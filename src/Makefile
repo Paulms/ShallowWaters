@@ -20,16 +20,18 @@ fluxes.o: ./fluxes.f90 decimal.o tipos.o RiemannSolvers.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./fluxes.f90
 funciones.o: ./funciones.f90 decimal.o tipos.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./funciones.f90
-main.o: ./main.f90 decimal.o fluxes.o tipos.o correctors.o plot.o funciones.o datos.o
+main.o: ./main.f90 decimal.o fluxes.o tipos.o correctors.o plot.o shallowwatersutils.o datos.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./main.f90
 plot.o: ./plot.f90 decimal.o tipos.o util.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./plot.f90
+shallowwatersutils.o: ./shallowwatersutils.f90 decimal.o tipos.o funciones.o
+	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./shallowwatersutils.f90
 tipos.o: ./tipos.f90 decimal.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./tipos.f90
 util.o: ./util.f90 decimal.o
 	$(FC) $(FFLAGS) $(OTHERFLAGS) -c	./util.f90
-SRC = ./datos.f90 ./fluxes.f90 ./correctors.f90 ./util.f90 ./RiemannSolvers.f90 ./plot.f90 ./main.f90 ./funciones.f90 ./decimal.f90 ./tipos.f90
-OBJ = datos.o fluxes.o correctors.o util.o RiemannSolvers.o plot.o main.o funciones.o decimal.o tipos.o
+SRC = ./decimal.f90 ./shallowwatersutils.f90 ./main.f90 ./fluxes.f90 ./tipos.f90 ./RiemannSolvers.f90 ./datos.f90 ./util.f90 ./plot.f90 ./correctors.f90 ./funciones.f90
+OBJ = decimal.o shallowwatersutils.o main.o fluxes.o tipos.o RiemannSolvers.o datos.o util.o plot.o correctors.o funciones.o
 clean: neat
 	-rm -f .../bin/SWSolver.cppdefs $(OBJ) ../bin/SWSolver
 neat:
