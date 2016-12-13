@@ -5,9 +5,9 @@ MODULE tipos
   TYPE SWSolution
     REAL(kind = dp), ALLOCATABLE    :: hh(:,:)        ! profundidad
     REAL(kind = dp), ALLOCATABLE    :: eta(:,:)        ! profundidad
-    REAL(kind = dp), ALLOCATABLE    :: deta(:,:)        ! profundidad
+    REAL(kind = dp), ALLOCATABLE    :: deta(:,:,:)        ! profundidad
     REAL(kind = dp), ALLOCATABLE    :: uu(:,:,:)      ! velocidad en x, (y)
-    REAL(kind = dp), ALLOCATABLE    :: du(:,:,:)      ! velocidad en x, (y)
+    REAL(kind = dp), ALLOCATABLE    :: du(:,:,:,:)      ! cell averaged with limiter
     INTEGER                         :: dims           ! dimensiones
   END TYPE
   TYPE SWBed

@@ -35,16 +35,16 @@ FF, GG, SS, xc)
   SELECT CASE (dims)
   CASE (1)
     ALLOCATE(U%hh(cellnumber, 1), U%uu(cellnumber, 1, 1))
-    ALLOCATE(U%eta(cellnumber, 1), U%deta(cellnumber, 1))
-    ALLOCATE(U%du(cellnumber, 1,1))
+    ALLOCATE(U%eta(cellnumber, 1), U%deta(cellnumber, 1,2))
+    ALLOCATE(U%du(cellnumber, 1,2,2))
     ALLOCATE(bed%elev(ednum, 1))
     ALLOCATE(bed%hc(cellnumber, 1), bed%dz(cellnumber, 1,1))
     ALLOCATE(FF(cellnumber+1,1,3),GG(1, cellnumber+1,3))
     ALLOCATE(SS(cellnumber,1,1))
   CASE (2)
     ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
-    ALLOCATE(U%du(cellnumber, cellnumber, dims))
-    ALLOCATE(U%eta(cellnumber, cellnumber), U%deta(cellnumber, cellnumber))
+    ALLOCATE(U%du(cellnumber, cellnumber, dims,dims))
+    ALLOCATE(U%eta(cellnumber, cellnumber), U%deta(cellnumber, cellnumber,2))
     ALLOCATE(bed%elev(ednum, ednum))
     ALLOCATE(bed%hc(cellnumber, cellnumber), bed%dz(cellnumber, cellnumber,2))
     ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
@@ -102,4 +102,65 @@ FF, GG, SS, xc)
   FF = 0.0_dp
   GG = 0.0_dp
 END SUBROUTINE setupInitialConditions
+
+SUBROUTINE limiter(vec, dvec, method,dir)
+  ! Flux limter to preserve monotonicity
+  REAL(kind=dp),INTENT(IN)    :: vec(:,:)
+  REAL(kind=dp),INTENT(out)   :: dvec(:,:)
+  REAL(kind=dp), ALLOCATABLE  :: df1(:,:), df2(:,:)
+  INTEGER                     :: method
+  INTEGER                     :: dir, nc,ny
+  nc = size(vec, 1)
+  ny = size(vec, 2)
+  ALLOCATE(df1(1:nc,1:ny), df2(1:nc,1:ny))
+  df1 = 0.0_dp;df2 = 0.0_dp
+  SELECT CASE(dir)
+  CASE(1)
+    dvec(1,:) = 0.0_dp
+    dvec(nc,:) = 0.0_dp
+    df1(2:nc-1,:) = vec(3:nc,:)-vec(2:nc-1,:)
+    df2(2:nc-1,:) = vec(2:nc-1,:)-vec(1:nc-2,:)
+  CASE(2)
+    dvec(:,1) = 0.0_dp
+    dvec(:,ny) = 0.0_dp
+    df1(:,2:ny-1) = vec(:,3:ny)-vec(:,2:ny-1)
+    df2(:,2:ny-1) = vec(:,2:ny-1)-vec(:,1:ny-2)
+  CASE default
+    print *, "Error direccion erronea para el limitador"
+    STOP
+  END SELECT
+  CALL limit(dvec,df1,df2,method)
+  DEALLOCATE(df1, df2)
+END SUBROUTINE
+
+SUBROUTINE limit(dvec, df1,df2, method)
+  ! CFL Independent Limiters
+  ! ''''''''''''''''''''''''
+  ! 1. minmod
+  ! 2. superbee
+  REAL(kind=dp),INTENT(out)   :: dvec(:,:)
+  REAL(kind=dp)               :: df1(:,:), df2(:,:)
+  INTEGER                     :: method, i, j,nc,ny
+  REAL(kind=dp)               :: s      !signo
+  nc = size(dvec,1)
+  ny = size(dvec,2)
+  IF (method==0) THEN !first order
+    dvec=0.0_dp;
+  ELSE IF (method >= 1 .AND. method <= 2) THEN!minmod (1) and superbee (2)
+    DO i = 1,nc
+      DO j = 1,ny
+        IF (df1(i,j)*df2(i,j) < 0) THEN
+            dvec(i,j)=0;
+        else
+            s=SIGN(1.0_dp,df1(i,j));
+            dvec(i,j)=s*min(max(ABS(df1(i,j)),ABS(df2(i,j))),&
+            method*min(ABS(df1(i,j)),ABS(df2(i,j))));
+        end IF
+      END DO
+    END DO
+  ELSE
+    PRINT *,"Metodo limitador de flujo no disponible"
+    STOP
+  END IF
+END SUBROUTINE
 END MODULE shallowWatersUtils

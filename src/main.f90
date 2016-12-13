@@ -39,14 +39,16 @@ PROGRAM ShallowWaters
   INTEGER                         :: dims           ! dimensiones del problema
   INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
   CHARACTER(32)                   :: file_input_name ! Archivo para leer datos
-  INTEGER                         :: iorder           ! orden del esquema
+  INTEGER                         :: order           ! orden del esquema
+  INTEGER                         :: limMethod       ! Method for flux limiter
 
   ! Inicializamos las variables
   cellsize = 0.0_dp; cellnumber = 0
   nt = 0; tf = 0.0_dp; tt = 0.0_dp
   amax = 0.0_dp; ejemplo = 1; dims = 0
   file_input_name = "input.dat"
-  iorder=2; !1=first order scheme, 2=second order scheme
+  order=2; !1=first order scheme, 2=second order scheme
+  limMethod = 2 !1 minmod 2 superbee
 
   ! Leemos variables desde archivo
   CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims, ejemplo)
@@ -58,10 +60,24 @@ PROGRAM ShallowWaters
   ! Calculamos estado del sistema en cada paso de tiempo
   DO tstep = 1,nt
       PRINT *, "Procesando paso temporal: ", tstep
-      CALL fluxes(U, cellnumber, FF, GG, bed, amax)
-      DO i = 1,dims
-        SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i)
-      END DO
+      IF (order == 2) THEN
+        DO i = 1,dims
+          CALL limiter(U%eta, U%deta(:,:,i), limMethod, i)
+          DO j = 1,dims
+            CALL limiter(U%uu(:,:,i),U%du(:,:,i,j), limMethod, j)
+          END DO
+        END DO
+        
+        CALL fluxes(U, cellnumber, FF, GG, bed, amax)
+        DO i = 1,dims
+          SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i)
+        END DO
+      ELSE
+        CALL fluxes(U, cellnumber, FF, GG, bed, amax)
+        DO i = 1,dims
+          SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i)
+        END DO
+      END IF
       PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
       U%eta=U%hh+bed%hc
