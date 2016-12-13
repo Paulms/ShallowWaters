@@ -54,7 +54,7 @@ PROGRAM ShallowWaters
   CALL setupInitialConditions(ejemplo, dims, cellsize, cellnumber, U, bed, FF, GG,& 
   SS, xc)
   ! Guardamos condicion inicial
-  CALL plot_results(U, xc, name, 0)
+  CALL plot_results(U, bed, xc, name, 0)
   ! Calculamos estado del sistema en cada paso de tiempo
   DO tstep = 1,nt
       PRINT *, "Procesando paso temporal: ", tstep
@@ -65,7 +65,7 @@ PROGRAM ShallowWaters
       PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
       U%eta=U%hh+bed%hc
-      CALL plot_results(U, xc, name, tstep)
+      CALL plot_results(U, bed, xc, name, tstep)
   END DO
   ! Liberamos memoria
   DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du)

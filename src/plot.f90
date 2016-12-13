@@ -8,10 +8,11 @@ MODULE plot
   USE tipos
   USE util
 CONTAINS
-  SUBROUTINE plot_results(U,x,nameb, iteracion)
+  SUBROUTINE plot_results(U,bed,x,nameb, iteracion)
     !
     ! Subrutina que genera archivos para la visualizacion
     TYPE(SWSolution)                :: U
+    TYPE(SWBed)                     :: bed            ! lecho
     REAL(KIND=dp),INTENT(IN)     :: x(:)
     CHARACTER(LEN=*),INTENT(IN)  :: nameb
     CHARACTER(LEN=32)             :: name
@@ -25,9 +26,9 @@ CONTAINS
     !
     SELECT CASE (U%dims)
     CASE (1)
-      CALL plot_paraview1D(name,U,x)
+      CALL plot_paraview1D(name,U,bed,x)
     case (2)
-      CALL plot_paraview2D(name,U,x,x)
+      CALL plot_paraview2D(name,U,bed,x,x)
     CASE default
       print *,"Numero de dimensiones incorrecto"
       STOP
@@ -35,11 +36,12 @@ CONTAINS
 
   END SUBROUTINE plot_results
 
-  SUBROUTINE plot_paraview2D(name,U,x, y)
+  SUBROUTINE plot_paraview2D(name,U,bed,x, y)
     !
     ! subrutina que imprime la malla y el resultado usando
     ! el visualizador PARAVIEW
     TYPE(SWSolution)             :: U
+    TYPE(SWBed)                  :: bed            ! lecho
     REAL(KIND=dp),INTENT(IN)     :: x(:), y(:)
     CHARACTER(LEN=*),INTENT(IN)  :: name
     CHARACTER(LEN=32)            :: name_dat
@@ -79,11 +81,11 @@ CONTAINS
     !
     ! Solucion discreta:
     !
-    WRITE(iunit1,'(A)')'SCALARS Profundidad float  1'
+    WRITE(iunit1,'(A)')'SCALARS AlturaAgua float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') U%hh(j,i)
+        WRITE(iunit1,'(E30.15)') U%eta(j,i)
       END DO
     END DO
     !
@@ -102,15 +104,23 @@ CONTAINS
         WRITE(iunit1,'(E30.15)') U%uu(j,i,2)
       END DO
     END DO
+    WRITE(iunit1,'(A)')'SCALARS ElevacionLecho float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+      DO i = 1,size(y,1)
+        WRITE(iunit1,'(E30.15)') bed%elev(j,i)
+      END DO
+    END DO
     CLOSE(iunit1)
     !
   END SUBROUTINE plot_paraview2D
 
-  SUBROUTINE plot_paraview1D(name,U,x)
+  SUBROUTINE plot_paraview1D(name,U,bed,x)
     !
     ! subrutina que imprime la malla y el resultado usando
     ! el visualizador PARAVIEW
     TYPE(SWSolution)             :: U
+    TYPE(SWBed)                  :: bed            ! lecho
     REAL(KIND=dp),INTENT(IN)     :: x(:)
     CHARACTER(LEN=*),INTENT(IN)  :: name
     CHARACTER(LEN=32)            :: name_dat
@@ -148,10 +158,10 @@ CONTAINS
     !
     ! Solucion discreta:
     !
-    WRITE(iunit1,'(A)')'SCALARS Profundidad float  1'
+    WRITE(iunit1,'(A)')'SCALARS AlturaAgua float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
-        WRITE(iunit1,'(E30.15)') U%hh(j,1)
+        WRITE(iunit1,'(E30.15)') U%eta(j,1)
     END DO
     !
     WRITE(iunit1,'(A)')'SCALARS VelocidadX float  1'
@@ -160,6 +170,12 @@ CONTAINS
         WRITE(iunit1,'(E30.15)') U%uu(j,1,1)
     END DO
     !
+    WRITE(iunit1,'(A)')'SCALARS ElevacionLecho float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+        WRITE(iunit1,'(E30.15)') bed%elev(j,1)
+    END DO
+    CLOSE(iunit1)
   END SUBROUTINE plot_paraview1D
 
 END MODULE plot
