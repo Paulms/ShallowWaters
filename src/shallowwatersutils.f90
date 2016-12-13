@@ -35,12 +35,16 @@ FF, GG, SS, xc)
   SELECT CASE (dims)
   CASE (1)
     ALLOCATE(U%hh(cellnumber, 1), U%uu(cellnumber, 1, 1))
+    ALLOCATE(U%eta(cellnumber, 1), U%deta(cellnumber, 1))
+    ALLOCATE(U%du(cellnumber, 1,1))
     ALLOCATE(bed%elev(ednum, 1))
     ALLOCATE(bed%hc(cellnumber, 1), bed%dz(cellnumber, 1,1))
     ALLOCATE(FF(cellnumber+1,1,3),GG(1, cellnumber+1,3))
     ALLOCATE(SS(cellnumber,1,1))
   CASE (2)
     ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
+    ALLOCATE(U%du(cellnumber, cellnumber, dims))
+    ALLOCATE(U%eta(cellnumber, cellnumber), U%deta(cellnumber, cellnumber))
     ALLOCATE(bed%elev(ednum, ednum))
     ALLOCATE(bed%hc(cellnumber, cellnumber), bed%dz(cellnumber, cellnumber,2))
     ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
@@ -53,6 +57,7 @@ FF, GG, SS, xc)
   ! Condiciones Iniciales
   U%dims = dims
   U%hh = 0.0_dp;   U%uu = 0.0_dp; bed%elev = 0.0_dp
+  U%eta = 0.0_dp; U%deta = 0.0_dp; U%du = 0.0_dp
   bed%hc = 0.0_dp; bed%dz = 0.0_dp
   ! Inicializamos el lecho del sistema
   CALL initial_elev(bed%elev)
@@ -77,17 +82,22 @@ FF, GG, SS, xc)
   SELECT CASE (ejemplo)
   CASE (0)
     ! Ejemplo definido por el usuario
-    CALL initial_h(U)
+    CALL initial_h(U%eta)
   CASE (1)
-    ! Agua elevada en la esquina
-    CALL initial_h_ejemplo1(U)
+    ! Dam break 1D
+    CALL initial_h_ejemplo1(U%eta)
   CASE (2)
+    ! Agua elevada en la esquina
+    CALL initial_h_ejemplo2(U%eta)
+  CASE (3)
     ! Gota de Agua (Gaussiana)
-    CALL initial_h_ejemplo2(U) 
+    CALL initial_h_ejemplo3(U%eta) 
   CASE default
     print *, "Ejemplo no implementado"
     STOP
   END SELECT
+  ! Calculamos altura real del agua
+  U%hh = U%eta - bed%elev
   ! Inicializamos velocidades
   FF = 0.0_dp
   GG = 0.0_dp

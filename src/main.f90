@@ -58,16 +58,17 @@ PROGRAM ShallowWaters
   ! Calculamos estado del sistema en cada paso de tiempo
   DO tstep = 1,nt
       PRINT *, "Procesando paso temporal: ", tstep
-      CALL fluxes(U, cellnumber, FF, GG, amax)
+      CALL fluxes(U, cellnumber, FF, GG, bed, amax)
       DO i = 1,dims
         SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i);
       END DO
       PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
+      U%eta=U%hh+bed%hc
       CALL plot_results(U, xc, name, tstep)
   END DO
   ! Liberamos memoria
-  DEALLOCATE(FF,GG, U%hh, U%uu)
+  DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du)
   DEALLOCATE(bed%elev, bed%hc, bed%dz)
   DEALLOCATE(SS,xc)
 END PROGRAM ShallowWaters
