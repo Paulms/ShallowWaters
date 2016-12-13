@@ -10,7 +10,6 @@ MODULE tipos
   TYPE SWBed
     REAL(kind = dp), ALLOCATABLE   :: elev(:,:)        ! elevacion centros
     REAL(kind = dp), ALLOCATABLE    :: hc(:,:)        ! elevacion centros
-    REAL(kind = dp), ALLOCATABLE    :: dx(:,:)      ! pendiente en x
-    REAL(kind = dp), ALLOCATABLE    :: dy(:,:)      ! pendiente en y
+    REAL(kind = dp), ALLOCATABLE    :: dz(:,:,:)      ! pendiente en x (y)
   END TYPE
 END MODULE tipos

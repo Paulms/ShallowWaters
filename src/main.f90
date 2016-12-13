@@ -39,12 +39,14 @@ PROGRAM ShallowWaters
   INTEGER                         :: dims           ! dimensiones del problema
   INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
   CHARACTER(32)                   :: file_input_name ! Archivo para leer datos
+  INTEGER                         :: iorder           ! orden del esquema
 
   ! Inicializamos las variables
   cellsize = 0.0_dp; cellnumber = 0
   nt = 0; tf = 0.0_dp; tt = 0.0_dp
   amax = 0.0_dp; ejemplo = 1; dims = 0
   file_input_name = "input.dat"
+  iorder=2; !1=first order scheme, 2=second order scheme
 
   ! Leemos variables desde archivo
   CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims, ejemplo)
@@ -57,12 +59,15 @@ PROGRAM ShallowWaters
   DO tstep = 1,nt
       PRINT *, "Procesando paso temporal: ", tstep
       CALL fluxes(U, cellnumber, FF, GG, amax)
+      DO i = 1,dims
+        SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i);
+      END DO
       PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
       CALL plot_results(U, xc, name, tstep)
   END DO
   ! Liberamos memoria
   DEALLOCATE(FF,GG, U%hh, U%uu)
-  DEALLOCATE(bed%elev, bed%hc, bed%dx, bed%dy)
+  DEALLOCATE(bed%elev, bed%hc, bed%dz)
   DEALLOCATE(SS,xc)
 END PROGRAM ShallowWaters
