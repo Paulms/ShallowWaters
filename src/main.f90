@@ -60,7 +60,7 @@ PROGRAM ShallowWaters
       PRINT *, "Procesando paso temporal: ", tstep
       CALL fluxes(U, cellnumber, FF, GG, bed, amax)
       DO i = 1,dims
-        SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i);
+        SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i)
       END DO
       PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
