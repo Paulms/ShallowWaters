@@ -11,6 +11,7 @@ PROGRAM ShallowWaters
   !! Version: 0.1                                         !!  
   !! Version 0.2: 8/Dic/2016 modulo funciones             !!
   !! Version 0.3: 11/Dic/2016 Problemas 1D                !!
+  !! Version 0.4: 13/Dic/2016 Second order methods        !!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   USE decimal               ! Define la precisión
   USE SWFluxes
@@ -51,7 +52,8 @@ PROGRAM ShallowWaters
   limMethod = 2 !1 minmod 2 superbee
 
   ! Leemos variables desde archivo
-  CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims, ejemplo)
+  CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims,& 
+  order, ejemplo)
   ! Ajustamos condiciones Iniciales
   CALL setupInitialConditions(ejemplo, dims, cellsize, cellnumber, U, bed, FF, GG,& 
   SS, xc)
