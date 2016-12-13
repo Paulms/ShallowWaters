@@ -3,11 +3,12 @@ use decimal
 use tipos
 IMPLICIT NONE
 CONTAINS
-  SUBROUTINE initial_h(bed)
+  SUBROUTINE initial_elev(elevacion)
     ! Editar esta función para imponer
     ! una condición al lecho del sistema
-    REAL(kind=dp)                :: bed(:,:) 
-    bed = 0.0_dp
+    ! altura en los vertices de las celdas
+    REAL(kind=dp)                :: elevacion(:,:) 
+    elevacion = 0.0_dp
   END SUBROUTINE
   SUBROUTINE initial_h(U)
     ! Editar esta función para imponer

@@ -8,7 +8,8 @@ MODULE tipos
     INTEGER                         :: dims           ! dimensiones
   END TYPE
   TYPE SWBed
-    REAL(kind = dp), ALLOCATABLE    :: elev(:,:)        ! elevacion
+    REAL(kind = dp), ALLOCATABLE   :: elev(:,:)        ! elevacion centros
+    REAL(kind = dp), ALLOCATABLE    :: hc(:,:)        ! elevacion centros
     REAL(kind = dp), ALLOCATABLE    :: dx(:,:)      ! pendiente en x
     REAL(kind = dp), ALLOCATABLE    :: dy(:,:)      ! pendiente en y
   END TYPE
