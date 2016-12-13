@@ -14,12 +14,12 @@ PROGRAM ShallowWaters
   !! Version 0.4: 13/Dic/2016 Second order methods        !!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   USE decimal               ! Define la precisión
-  USE SWFluxes
-  USE Tipos
-  USE correctors
-  USE plot
+  USE SWFluxes              ! Actualiza los flujos
+  USE Tipos                 
+  USE correctors            ! Correctores
+  USE plot                  ! Almacenar archivos para graficos
   USE ShallowWatersUtils
-  USE datos
+  USE datos                 ! Leer datos
 
   IMPLICIT NONE
   ! Definimos variables a utilizar
@@ -35,8 +35,8 @@ PROGRAM ShallowWaters
   TYPE(SWBed)                     :: bed            ! lecho
   TYPE(SWSolution)                :: U              !solucion
   INTEGER                         :: tstep, i, j, center    !iteradores
-  CHARACTER(LEN=32)               :: name
-  REAL(kind = dp)                 :: amax
+  CHARACTER(LEN=32)               :: name           ! Archivo para guardar resp
+  REAL(kind = dp)                 :: amax           ! Para calculo de CFL
   INTEGER                         :: dims           ! dimensiones del problema
   INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
   CHARACTER(32)                   :: file_input_name ! Archivo para leer datos
@@ -63,6 +63,7 @@ PROGRAM ShallowWaters
   DO tstep = 1,nt
       PRINT *, "Procesando paso temporal: ", tstep
       IF (order == 2) THEN
+        ! Utilizar limitador de pendiente para mantener monotonia
         DO i = 1,dims
           CALL limiter(U%eta, U%deta(:,:,i), limMethod, i)
           DO j = 1,dims
