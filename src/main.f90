@@ -67,13 +67,13 @@ PROGRAM ShallowWaters
             CALL limiter(U%uu(:,:,i),U%du(:,:,i,j), limMethod, j)
           END DO
         END DO
-        
-        CALL fluxes(U, cellnumber, FF, GG, bed, amax)
+        CALL predictor(U, bed, dt, cellsize)
         DO i = 1,dims
-          SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i)
+          SS(:,:,i) = grav/cellsize*(U%etap-bed%hc)*bed%dz(:,:,i)
         END DO
+        CALL fluxes(U, U%etap, U%up, cellnumber, FF, GG, bed, amax)
       ELSE
-        CALL fluxes(U, cellnumber, FF, GG, bed, amax)
+        CALL fluxes(U, U%eta, U%uu, cellnumber, FF, GG, bed, amax)
         DO i = 1,dims
           SS(:,:,i) = grav/cellsize*U%hh*bed%dz(:,:,i)
         END DO
@@ -84,7 +84,7 @@ PROGRAM ShallowWaters
       CALL plot_results(U, bed, xc, name, tstep)
   END DO
   ! Liberamos memoria
-  DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du)
+  DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du, U%etap, U%up)
   DEALLOCATE(bed%elev, bed%hc, bed%dz)
   DEALLOCATE(SS,xc)
 END PROGRAM ShallowWaters

@@ -5,9 +5,10 @@ MODULE SWfluxes
 IMPLICIT NONE
 CONTAINS
 
-  SUBROUTINE fluxes(UU, cellnumber, FF, GG, bed, amax)
-    TYPE(SWSolution), INTENT(in) :: UU           !solucion
+  SUBROUTINE fluxes(U, eta , uu, cellnumber, FF, GG, bed, amax)
+    TYPE(SWSolution), INTENT(in) :: U           !solucion
     INTEGER, INTENT(in)          :: cellnumber
+    REAL(kind = dp)              :: eta(:,:), uu(:,:,:)
     REAL(kind = dp)              :: FF(:,:,:), GG(:,:,:)    !Flujos
     TYPE(SWBed)                     :: bed            ! lecho
     REAL(kind = dp)              :: amax,a
@@ -23,68 +24,67 @@ CONTAINS
     amax = 0.0_dp
     DO j = 2,cellnumber
         inner: DO k = 1, cellnumber
-            hl=UU%eta(j-1,k)+0.5*(UU%deta(j-1,k,1)+UU%deta(j-1,k,2)) - bed%elev(j,k)
-            hr=UU%eta(j,k)-0.5*(UU%deta(j,k,1)+UU%deta(j,k,2)) - bed%elev(j,k)
-            ul=UU%uu(j-1,k,1)+0.5*(UU%du(j-1,k,1,1)+UU%du(j-1,k,1,2))
-            ur=UU%uu(j,k,1)-0.5*(UU%du(j,k,1,1)+UU%du(j,k,1,2))
+            hl=eta(j-1,k)+0.5*U%deta(j-1,k,1) - bed%elev(j,k)
+            hr=eta(j,k)-0.5*U%deta(j,k,1) - bed%elev(j,k)
+            ul=uu(j-1,k,1)+0.5*(U%du(j-1,k,1,1)+U%du(j-1,k,1,2))
+            ur=uu(j,k,1)-0.5*(U%du(j,k,1,1)+U%du(j,k,1,2))
             CALL solver(hl,hr,ul,ur,vl,vr,normal, FF(j,k,:), a)
             amax=max(a,amax);
-            IF (UU%dims == 1) THEN
+            IF (U%dims == 1) THEN
                 EXIT inner
             END IF
         END DO inner
     END DO
     ! Condiciones de borde de la pared izquierda de la caja
     DO k=1,cellnumber
-        hr=UU%eta(1,k)-0.5*(UU%deta(1,k,1)+UU%deta(1,k,2))-bed%elev(1,k) 
-        ur=UU%uu(1,k,1) - 0.5*(UU%du(1,k,1,1)+UU%du(1,k,1,2))
+        hr=eta(1,k)-0.5*U%deta(1,k,1)-bed%elev(1,k) 
+        ur=uu(1,k,1) - 0.5*(U%du(1,k,1,1)+U%du(1,k,1,2))
         CALL solver(hr,hr,-ur,ur,vr,vr,normal, FF(1,k,:), a)
         amax=max(a,amax);
-        IF (UU%dims == 1) THEN
+        IF (U%dims == 1) THEN
             EXIT
         END IF
     END DO
     ! Condiciones de borde de la pared derecha de la caja
     DO k=1,cellnumber
-        hl=UU%eta(cellnumber,k)+&
-        0.5*(UU%deta(cellnumber,k,1)+UU%deta(cellnumber,k,2))-bed%elev(cellnumber,k)
-        ul=UU%uu(cellnumber,k,1) +&
-        0.5*(UU%du(cellnumber,k,1,1)+UU%du(cellnumber,k,1,2))
+        hl=eta(cellnumber,k)+&
+        0.5*U%deta(cellnumber,k,1)-bed%elev(cellnumber,k)
+        ul=uu(cellnumber,k,1) +&
+        0.5*(U%du(cellnumber,k,1,1)+U%du(cellnumber,k,1,2))
         CALL solver(hl,hl,ul,-ul,vl,vl,normal, FF(cellnumber+1,k,:), a)
         amax=max(a,amax);
-        IF (UU%dims == 1) THEN
+        IF (U%dims == 1) THEN
             EXIT
         END IF
     END DO
 
     ! Calculamos flujos en la direccion y
-    IF (UU%dims == 2) THEN
+    IF (U%dims == 2) THEN
         normal = (/1.0_dp, 0.0_dp/)
         DO k=2,cellnumber
             DO j=1,cellnumber
-                hl=UU%eta(j,k-1) + 0.5*(UU%deta(j,k-1,1)+UU%deta(j,k-1,2))-bed%elev(j,k)
-                hr=UU%eta(j,k) - 0.5*(UU%deta(j,k,1)+UU%deta(j,k,2)) - bed%elev(j,k)
-                vl=UU%uu(j,k-1,2) + &
-                0.5*(UU%du(j,k-1,2,1)+UU%du(j,k-1,2,2))
-                vr=UU%uu(j,k,2) - &
-                0.5*(UU%du(j,k,2,1)+UU%du(j,k,2,2))
+                hl=eta(j,k-1) + 0.5*U%deta(j,k-1,2)-bed%elev(j,k)
+                hr=eta(j,k) - 0.5*U%deta(j,k,2) - bed%elev(j,k)
+                vl=uu(j,k-1,2) + &
+                0.5*(U%du(j,k-1,2,1)+U%du(j,k-1,2,2))
+                vr=uu(j,k,2) - &
+                0.5*(U%du(j,k,2,1)+U%du(j,k,2,2))
                 CALL solver(hl,hr,ul,ur,vl,vr,normal, GG(j,k,:), a)
                 amax=max(a,amax);
             END DO
         END DO
         ! Condiciones de pared para borde inferior de la caja
         DO j=1,cellnumber
-            hr=UU%eta(j,1)-0.5*(UU%deta(j,1,1)+UU%deta(j,1,2))-bed%elev(j,1)
-            vr=UU%uu(j,1,2) - 0.5*(UU%du(j,1,2,1)+UU%du(j,1,2,2))
+            hr=eta(j,1)-0.5*U%deta(j,1,2)-bed%elev(j,1)
+            vr=uu(j,1,2) - 0.5*(U%du(j,1,2,1)+U%du(j,1,2,2))
             CALL solver(hr,hr,ur,ur,-vr,vr,normal, GG(j,1,:), a)
             amax=max(a,amax);
         END DO
         ! Condiciones de borde superior de la caja
         DO j = 1, cellnumber
-            hl=UU%eta(j,cellnumber)+&
-            0.5*(UU%deta(j,cellnumber,1)+UU%deta(j,cellnumber,2))-bed%elev(j,cellnumber)
-            vl=UU%uu(j,cellnumber,2) + 0.5*(UU%du(j,cellnumber,2,1)+&
-            UU%du(j,cellnumber,2,2))
+            hl=eta(j,cellnumber)+0.5*U%deta(j,cellnumber,2)-bed%elev(j,cellnumber)
+            vl=uu(j,cellnumber,2) + 0.5*(U%du(j,cellnumber,2,1)+&
+            U%du(j,cellnumber,2,2))
             CALL solver(hl,hl,ul,ul,vl,-vl,normal, GG(j,cellnumber+1,:), a)
             amax=max(a,amax);
         END DO

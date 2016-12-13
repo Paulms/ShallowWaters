@@ -36,6 +36,7 @@ FF, GG, SS, xc)
   CASE (1)
     ALLOCATE(U%hh(cellnumber, 1), U%uu(cellnumber, 1, 1))
     ALLOCATE(U%eta(cellnumber, 1), U%deta(cellnumber, 1,2))
+    ALLOCATE(U%etap(cellnumber, 1), U%up(cellnumber, 1, 1))
     ALLOCATE(U%du(cellnumber, 1,2,2))
     ALLOCATE(bed%elev(ednum, 1))
     ALLOCATE(bed%hc(cellnumber, 1), bed%dz(cellnumber, 1,1))
@@ -45,6 +46,7 @@ FF, GG, SS, xc)
     ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
     ALLOCATE(U%du(cellnumber, cellnumber, dims,dims))
     ALLOCATE(U%eta(cellnumber, cellnumber), U%deta(cellnumber, cellnumber,2))
+    ALLOCATE(U%etap(cellnumber, cellnumber), U%up(cellnumber, cellnumber, dims))
     ALLOCATE(bed%elev(ednum, ednum))
     ALLOCATE(bed%hc(cellnumber, cellnumber), bed%dz(cellnumber, cellnumber,2))
     ALLOCATE(FF(cellnumber+1,cellnumber,3),GG(cellnumber, cellnumber+1,3))
@@ -59,6 +61,7 @@ FF, GG, SS, xc)
   U%hh = 0.0_dp;   U%uu = 0.0_dp; bed%elev = 0.0_dp
   U%eta = 0.0_dp; U%deta = 0.0_dp; U%du = 0.0_dp
   bed%hc = 0.0_dp; bed%dz = 0.0_dp
+  U%etap = 0.0_dp; U%up = 0.0_dp
   ! Inicializamos el lecho del sistema
   CALL initial_elev(bed%elev)
   ! Calculamos alturas centrales y pendientes
@@ -162,5 +165,30 @@ SUBROUTINE limit(dvec, df1,df2, method)
     PRINT *,"Metodo limitador de flujo no disponible"
     STOP
   END IF
+END SUBROUTINE
+
+SUBROUTINE predictor(U, bed, dt, dx)
+  TYPE(SWBed)                     :: bed            ! lecho
+  TYPE(SWSolution)                :: U              !solucion
+  REAL(kind=dp)                   :: dt, dx
+  INTEGER                         :: i
+
+  SELECT CASE (U%dims)
+  CASE (1)
+    U%etap = U%eta - 0.5*dt/dx*(U%hh*U%du(:,:,1,1) + &
+    U%uu(:,:,1)*(U%deta(:,:,1) - bed%dz(:,:,1)))
+    U%up(:,:,1) = U%uu(:,:,1) - 0.5*dt/dx*(U%uu(:,:,1)*U%du(:,:,1,1) + grav*U%deta(:,:,1))
+  CASE (2)
+    U%etap = U%eta - 0.5*dt/dx*&
+    (U%hh*(U%du(:,:,1,1)+U%du(:,:,1,2)+U%du(:,:,2,1)+U%du(:,:,2,2)) + &
+    (U%uu(:,:,1)*(U%deta(:,:,1) - bed%dz(:,:,1))+U%uu(:,:,2)*(U%deta(:,:,2) - bed%dz(:,:,2))))
+    DO i = 1, 2
+      U%up(:,:,i) = U%uu(:,:,i) - 0.5*dt/dx*&
+      (U%uu(:,:,i)*U%du(:,:,i,1)+U%uu(:,:,i)*U%du(:,:,i,2) + grav*U%deta(:,:,i))
+    END DO
+  CASE default
+    print *, "Error en dimensiones - predictor"
+    STOP
+  END SELECT
 END SUBROUTINE
 END MODULE shallowWatersUtils
