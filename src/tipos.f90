@@ -8,6 +8,7 @@ MODULE tipos
     REAL(kind = dp), ALLOCATABLE    :: etap(:,:)        ! profundidad
     REAL(kind = dp), ALLOCATABLE    :: deta(:,:,:)        ! profundidad
     REAL(kind = dp), ALLOCATABLE    :: uu(:,:,:)      ! velocidad en x, (y)
+    REAL(kind = dp), ALLOCATABLE    :: uh(:,:,:)      ! velocidad en x, (y)
     REAL(kind = dp), ALLOCATABLE    :: up(:,:,:)      ! velocidad en x, (y)
     REAL(kind = dp), ALLOCATABLE    :: du(:,:,:,:)      ! cell averaged with limiter
     INTEGER                         :: dims           ! dimensiones

@@ -35,6 +35,7 @@ FF, GG, SS, xc)
   SELECT CASE (dims)
   CASE (1)
     ALLOCATE(U%hh(cellnumber, 1), U%uu(cellnumber, 1, 1))
+    ALLOCATE(U%uh(cellnumber, 1, 1))
     ALLOCATE(U%eta(cellnumber, 1), U%deta(cellnumber, 1,2))
     ALLOCATE(U%etap(cellnumber, 1), U%up(cellnumber, 1, 1))
     ALLOCATE(U%du(cellnumber, 1,2,2))
@@ -44,6 +45,7 @@ FF, GG, SS, xc)
     ALLOCATE(SS(cellnumber,1,1))
   CASE (2)
     ALLOCATE(U%hh(cellnumber, cellnumber), U%uu(cellnumber, cellnumber, dims))
+    ALLOCATE(U%uh(cellnumber, cellnumber, dims))
     ALLOCATE(U%du(cellnumber, cellnumber, dims,dims))
     ALLOCATE(U%eta(cellnumber, cellnumber), U%deta(cellnumber, cellnumber,2))
     ALLOCATE(U%etap(cellnumber, cellnumber), U%up(cellnumber, cellnumber, dims))
@@ -59,6 +61,7 @@ FF, GG, SS, xc)
   ! Condiciones Iniciales
   U%dims = dims
   U%hh = 0.0_dp;   U%uu = 0.0_dp; bed%elev = 0.0_dp
+  U%uh = 0.0_dp
   U%eta = 0.0_dp; U%deta = 0.0_dp; U%du = 0.0_dp
   bed%hc = 0.0_dp; bed%dz = 0.0_dp
   U%etap = 0.0_dp; U%up = 0.0_dp
@@ -101,7 +104,7 @@ FF, GG, SS, xc)
     STOP
   END SELECT
   ! Calculamos altura real del agua
-  U%hh = U%eta - bed%elev
+  U%hh = U%eta - bed%hc
   ! Inicializamos velocidades
   FF = 0.0_dp
   GG = 0.0_dp

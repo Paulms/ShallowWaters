@@ -28,13 +28,17 @@ CONTAINS
     cl=(grav*hl)**0.5;
     cr=(grav*hr)**0.5;
     hhat=(hl**0.5)*(hr**0.5)
-    uhat=(hl**0.5*ul + hr**0.5*ur)/(hl**0.5+hr**0.5)
-    vhat=(hl**0.5*vl + hr**0.5*vr)/(hl**0.5+hr**0.5);
+    IF (hl > 0 .AND. hr > 0) THEN
+      uhat=(hl**0.5*ul + hr**0.5*ur)/(hl**0.5+hr**0.5)
+      vhat=(hl**0.5*vl + hr**0.5*vr)/(hl**0.5+hr**0.5)
+    END IF
     chat=(0.5*grav*(hl+hr))**0.5;
     ! Delta de las variables características: v_techo
+    if (chat /= 0) THEN
     dW(1) = 0.5*((hr-hl)-hhat*((ur-ul)*normal(2)+(vr-vl)*normal(1))/chat)
-    dW(2) = hhat*((ul-ur)*normal(1)+(vr-vl)*normal(2))
     dw(3) = 0.5*(hr-hl+hhat*((ur-ul)*normal(2)+(vr-vl)*normal(1))/chat)
+    END IF
+    dW(2) = hhat*((ul-ur)*normal(1)+(vr-vl)*normal(2))
 
     ! Matriz de vectores propios de la derecha R
     ! formula (11) Bradford 2002

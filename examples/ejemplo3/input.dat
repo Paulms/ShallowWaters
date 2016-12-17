@@ -1,6 +1,6 @@
-1.0         -------> Tamaño de celda
+5.0         -------> Tamaño de celda
 20          -------> número de celdas
-50          -------> número de pasos temporales
+100          -------> número de pasos temporales
 0.1         -------> Tamaño del paso temporal
 resultado   -------> nombre archivo de salida
 2           -------> dimensiones (1 o 2)

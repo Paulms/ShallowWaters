@@ -92,6 +92,10 @@ PROGRAM ShallowWaters
         END DO
       END IF
       PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
+      IF (dt*amax/cellsize > 1) THEN
+        print *, "Error CFL >1"
+        EXIT
+      END IF
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
       U%eta=U%hh+bed%hc
       if (errors == 1) THEN
@@ -100,7 +104,7 @@ PROGRAM ShallowWaters
       CALL plot_results(U, bed, xc, name, tstep, Hexact, Uexact)
   END DO
   ! Liberamos memoria
-  DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du, U%etap, U%up)
+  DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du, U%etap, U%up, U%uh)
   DEALLOCATE(bed%elev, bed%hc, bed%dz)
   DEALLOCATE(SS,xc)
   DEALLOCATE(Hexact, Uexact)
