@@ -9,7 +9,7 @@ CONTAINS
     REAL(kind = dp)                 :: SS(:,:,:)        ! Fuente
     INTEGER                         :: n     !numero de celdas
     REAL(kind = dp)                 :: dt,dx   
-    INTEGER                         :: i, j,k,l  !iteraciones
+    INTEGER                         :: i    !iteraciones
     U%hh=U%hh-dt/dx*(FF(2:n+1,:,1)-FF(1:n,:,1)+GG(:,2:n+1,1)-GG(:,1:n,1))
     DO i = 1, U%dims
       U%uh(:,:,i)=(U%uh(:,:,i)-dt/dx*(FF(2:n+1,:,i+1)-FF(1:n,:,i+1)+GG(:,2:n+1,i+1)-&

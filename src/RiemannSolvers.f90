@@ -11,7 +11,6 @@ CONTAINS
     !
     REAL(kind = dp)              :: Flux(:)   !vector de nx3
     REAL(kind = dp)              :: amax
-    INTEGER                      :: i, j, k, n
     REAL(kind = dp)              :: normal(2)
     REAL(kind = dp)              :: hl, hr
     REAL(kind = dp)              :: ul, ur

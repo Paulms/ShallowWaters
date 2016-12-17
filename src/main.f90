@@ -34,7 +34,7 @@ PROGRAM ShallowWaters
   REAL(kind = dp), ALLOCATABLE    :: SS(:,:,:)        ! Source
   TYPE(SWBed)                     :: bed            ! lecho
   TYPE(SWSolution)                :: U              !solucion
-  INTEGER                         :: tstep, i, j, center    !iteradores
+  INTEGER                         :: tstep, i, j    !iteradores
   CHARACTER(LEN=32)               :: name           ! Archivo para guardar resp
   REAL(kind = dp)                 :: amax           ! Para calculo de CFL
   INTEGER                         :: dims           ! dimensiones del problema

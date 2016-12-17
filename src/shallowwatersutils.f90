@@ -14,7 +14,7 @@ FF, GG, SS, xc)
   REAL(kind = dp), ALLOCATABLE    :: SS(:,:,:)        ! Source
   TYPE(SWBed)                     :: bed            ! lecho
   TYPE(SWSolution)                :: U              !solucion
-  INTEGER                         :: i, j, center    !iteradores
+  INTEGER                         :: i, j           !iteradores
   INTEGER                         :: dims           ! dimensiones del problema
   INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
   !Inicializamos variables

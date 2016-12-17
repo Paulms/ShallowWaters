@@ -12,7 +12,7 @@ CONTAINS
     REAL(kind = dp)              :: FF(:,:,:), GG(:,:,:)    !Flujos
     TYPE(SWBed)                     :: bed            ! lecho
     REAL(kind = dp)              :: amax,a
-    INTEGER                      :: i, j, k
+    INTEGER                      :: j, k
     REAL(kind = dp)              :: normal(2)
     REAL(kind = dp)              :: hl, hr
     REAL(kind = dp)              :: ul, ur

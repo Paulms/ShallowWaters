@@ -49,7 +49,7 @@ CONTAINS
     REAL(KIND=dp),INTENT(IN)     :: x(:), y(:)
     CHARACTER(LEN=*),INTENT(IN)  :: name
     CHARACTER(LEN=32)            :: name_dat
-    INTEGER                      :: i,j,nod,iunit1,cell_type
+    INTEGER                      :: i,j,nod,iunit1
     !
     name_dat = TRIM(ADJUSTL(name))//".vtk"  
     !
@@ -154,7 +154,7 @@ CONTAINS
     REAL(KIND=dp),INTENT(IN)     :: x(:)
     CHARACTER(LEN=*),INTENT(IN)  :: name
     CHARACTER(LEN=32)            :: name_dat
-    INTEGER                      :: i,j,nod,iunit1,cell_type
+    INTEGER                      :: i,j,nod,iunit1
     !
     name_dat = TRIM(ADJUSTL(name))//".vtk"  
     !
