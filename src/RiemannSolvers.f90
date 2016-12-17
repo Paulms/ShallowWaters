@@ -28,7 +28,7 @@ CONTAINS
     cl=(grav*hl)**0.5;
     cr=(grav*hr)**0.5;
     hhat=(hl**0.5)*(hr**0.5)
-    IF (hl > 0 .AND. hr > 0) THEN
+    IF (hl > 0 .OR. hr > 0) THEN
       uhat=(hl**0.5*ul + hr**0.5*ur)/(hl**0.5+hr**0.5)
       vhat=(hl**0.5*vl + hr**0.5*vr)/(hl**0.5+hr**0.5)
     END IF
