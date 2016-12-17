@@ -49,9 +49,9 @@ CONTAINS
     ar1=ur*normal(2)+vr*normal(1)-cr;
     ar3=ur*normal(2)+vr*normal(1)+cr;
 
-    da1=max(0.0-dp,2.0_dp*(ar1-al1));
+    da1=max(0.0_dp,2.0_dp*(ar1-al1));
     da3=max(0.0_dp,2.0_dp*(ar3-al3));
-    a1=abs(uhat*normal(2)+vhat*normal(1)-chat);
+    a1=abs(uhat*normal(2)+vhat*normal(1)-chat); 
     a2=abs(uhat*normal(2)+vhat*normal(1));
     a3=abs(uhat*normal(2)+vhat*normal(1)+chat);
 

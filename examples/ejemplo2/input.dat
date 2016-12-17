@@ -6,3 +6,4 @@ resultado   -------> nombre archivo de salida
 2           -------> dimensiones (1 o 2)
 2           -------> orden del esquema
 2           -------> ejemplo: 0 definido por usuario, 1 ejemplo1 2 ejemplo2
+0           -------> calcular erroes (0 no 1 si)

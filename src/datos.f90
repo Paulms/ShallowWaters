@@ -12,7 +12,7 @@ MODULE datos
   PRIVATE 
   CONTAINS
   SUBROUTINE leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims, &
-  order, ejemplo)
+  order, ejemplo, errors)
     !======================================================
     ! Leemos datos de un problema lineal almacenados
     ! en un solo archivo file_input_name
@@ -26,6 +26,7 @@ MODULE datos
     INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
     INTEGER                         :: dims           ! dimensiones del problema
     INTEGER                         :: order          ! orden del esquema
+    INTEGER                         :: errors         ! estimar errores
     INTEGER                         :: iunit          ! id para archivo
     CALL util_get_unit(iunit)
     OPEN(iunit,file=file_input_name, status='old', action='read')
@@ -37,6 +38,7 @@ MODULE datos
       READ(iunit,*) dims
       READ(iunit,*) order
       READ(iunit,*) ejemplo
+      READ(iunit,*) errors
     CLOSE(iunit)
    END SUBROUTINE leer_archivo
 END MODULE datos

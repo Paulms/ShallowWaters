@@ -42,6 +42,8 @@ PROGRAM ShallowWaters
   CHARACTER(32)                   :: file_input_name ! Archivo para leer datos
   INTEGER                         :: order           ! orden del esquema
   INTEGER                         :: limMethod       ! Method for flux limiter
+  INTEGER                         :: errors          ! estimar errores 0 no 1 si
+  REAL(kind=dp), ALLOCATABLE      :: Hexact(:,:), Uexact(:,:,:)
 
   ! Inicializamos las variables
   cellsize = 0.0_dp; cellnumber = 0
@@ -50,17 +52,25 @@ PROGRAM ShallowWaters
   file_input_name = "input.dat"
   order=2; !1=first order scheme, 2=second order scheme
   limMethod = 2 !1 minmod 2 superbee
+  errors = 0
 
   ! Leemos variables desde archivo
   CALL leer_archivo (file_input_name, cellsize, cellnumber, nt, dt, name, dims,& 
-  order, ejemplo)
+  order, ejemplo, errors)
   ! Ajustamos condiciones Iniciales
   CALL setupInitialConditions(ejemplo, dims, cellsize, cellnumber, U, bed, FF, GG,& 
   SS, xc)
+  ALLOCATE(Uexact(size(U%uu,1), size(U%uu,2), size(U%uu,3)))
+  ALLOCATE(Hexact(size(U%hh,1), size(U%hh,2)))
+  Uexact = 0.0_dp; Hexact = 0.0_dp
   ! Guardamos condicion inicial
-  CALL plot_results(U, bed, xc, name, 0)
+  if (errors == 1) THEN
+    CALL exact_sol(xc, 0.0_dp, Hexact, Uexact, ejemplo)
+  end if
+  CALL plot_results(U, bed, xc, name, 0, Hexact, Uexact)
   ! Calculamos estado del sistema en cada paso de tiempo
   DO tstep = 1,nt
+      tt = tt + dt
       PRINT *, "Procesando paso temporal: ", tstep
       IF (order == 2) THEN
         ! Utilizar limitador de pendiente para mantener monotonia
@@ -84,10 +94,14 @@ PROGRAM ShallowWaters
       PRINT ("(A,F10.4)"), "Condicion CFL: ", dt*amax/cellsize
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
       U%eta=U%hh+bed%hc
-      CALL plot_results(U, bed, xc, name, tstep)
+      if (errors == 1) THEN
+        CALL exact_sol(xc, tt, Hexact, Uexact, ejemplo)
+      end if
+      CALL plot_results(U, bed, xc, name, tstep, Hexact, Uexact)
   END DO
   ! Liberamos memoria
   DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du, U%etap, U%up)
   DEALLOCATE(bed%elev, bed%hc, bed%dz)
   DEALLOCATE(SS,xc)
+  DEALLOCATE(Hexact, Uexact)
 END PROGRAM ShallowWaters

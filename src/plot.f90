@@ -8,7 +8,7 @@ MODULE plot
   USE tipos
   USE util
 CONTAINS
-  SUBROUTINE plot_results(U,bed,x,nameb, iteracion)
+  SUBROUTINE plot_results(U,bed,x,nameb, iteracion, Hexact, Uexact)
     !
     ! Subrutina que genera archivos para la visualizacion
     TYPE(SWSolution)                :: U
@@ -18,6 +18,8 @@ CONTAINS
     CHARACTER(LEN=32)             :: name
     INTEGER                      :: iteracion
     CHARACTER(LEN=8)             :: string
+    REAL(kind=dp)                :: Hexact(:,:)
+    REAL(kind=dp)                :: Uexact(:,:,:)
     !
     write(string,'(i8)') iteracion
     name = TRIM(ADJUSTL(nameb))//'.'//TRIM(ADJUSTL(string))
@@ -26,9 +28,9 @@ CONTAINS
     !
     SELECT CASE (U%dims)
     CASE (1)
-      CALL plot_paraview1D(name,U,bed,x)
+      CALL plot_paraview1D(name,U,bed,Hexact, Uexact,x)
     case (2)
-      CALL plot_paraview2D(name,U,bed,x,x)
+      CALL plot_paraview2D(name,U,bed,Hexact, Uexact,x,x)
     CASE default
       print *,"Numero de dimensiones incorrecto"
       STOP
@@ -36,12 +38,14 @@ CONTAINS
 
   END SUBROUTINE plot_results
 
-  SUBROUTINE plot_paraview2D(name,U,bed,x, y)
+  SUBROUTINE plot_paraview2D(name,U,bed,Hexact, Uexact,x, y)
     !
     ! subrutina que imprime la malla y el resultado usando
     ! el visualizador PARAVIEW
     TYPE(SWSolution)             :: U
     TYPE(SWBed)                  :: bed            ! lecho
+    REAL(kind=dp)                :: Hexact(:,:)
+    REAL(kind=dp)                :: Uexact(:,:,:)
     REAL(KIND=dp),INTENT(IN)     :: x(:), y(:)
     CHARACTER(LEN=*),INTENT(IN)  :: name
     CHARACTER(LEN=32)            :: name_dat
@@ -111,16 +115,42 @@ CONTAINS
         WRITE(iunit1,'(E30.15)') bed%elev(j,i)
       END DO
     END DO
+    ! Almacenamos soluciones exactas
+        WRITE(iunit1,'(A)')'SCALARS AlturaAguaExact float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+      DO i = 1,size(y,1)
+        WRITE(iunit1,'(E30.15)') Hexact(j,i)
+      END DO
+    END DO
+    !
+    WRITE(iunit1,'(A)')'SCALARS VelocidadXExact float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+      DO i = 1,size(y,1)
+        WRITE(iunit1,'(E30.15)') Uexact(j,i,1)
+      END DO
+    END DO
+    !
+    WRITE(iunit1,'(A)')'SCALARS VelocidadYExact float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+      DO i = 1,size(y,1)
+        WRITE(iunit1,'(E30.15)') Uexact(j,i,2)
+      END DO
+    END DO
     CLOSE(iunit1)
     !
   END SUBROUTINE plot_paraview2D
 
-  SUBROUTINE plot_paraview1D(name,U,bed,x)
+  SUBROUTINE plot_paraview1D(name,U,bed,Hexact, Uexact,x)
     !
     ! subrutina que imprime la malla y el resultado usando
     ! el visualizador PARAVIEW
     TYPE(SWSolution)             :: U
     TYPE(SWBed)                  :: bed            ! lecho
+    REAL(kind=dp)                :: Hexact(:,:)
+    REAL(kind=dp)                :: Uexact(:,:,:)
     REAL(KIND=dp),INTENT(IN)     :: x(:)
     CHARACTER(LEN=*),INTENT(IN)  :: name
     CHARACTER(LEN=32)            :: name_dat
@@ -174,6 +204,18 @@ CONTAINS
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
         WRITE(iunit1,'(E30.15)') bed%elev(j,1)
+    END DO
+    ! Almacenamos soluciones exactas
+        WRITE(iunit1,'(A)')'SCALARS AlturaAguaExact float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+        WRITE(iunit1,'(E30.15)') Hexact(j,1)
+    END DO
+    !
+    WRITE(iunit1,'(A)')'SCALARS VelocidadXExact float  1'
+    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    DO j=1,size(x,1)
+        WRITE(iunit1,'(E30.15)') Uexact(j,1,1)
     END DO
     CLOSE(iunit1)
   END SUBROUTINE plot_paraview1D

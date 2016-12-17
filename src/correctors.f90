@@ -10,10 +10,13 @@ CONTAINS
     INTEGER                         :: n     !numero de celdas
     REAL(kind = dp)                 :: dt,dx   
     INTEGER                         :: i, j,k,l  !iteraciones
-
+    REAL(kind=dp), ALLOCATABLE      :: ho(:,:)
+    ALLOCATE(ho(size(U%hh,1), size(U%hh,2)))
+    ho = 0.0_dp
+    ho = U%hh
     U%hh=U%hh-dt/dx*(FF(2:n+1,:,1)-FF(1:n,:,1)+GG(:,2:n+1,1)-GG(:,1:n,1))
     DO i = 1, U%dims
-      U%uu(:,:,i)=U%uu(:,:,i)-(dt/dx*(FF(2:n+1,:,i+1)-FF(1:n,:,i+1)+GG(:,2:n+1,i+1)-&
+      U%uu(:,:,i)=(U%uu(:,:,i)*ho-dt/dx*(FF(2:n+1,:,i+1)-FF(1:n,:,i+1)+GG(:,2:n+1,i+1)-&
       GG(:,1:n,i+1))-dt*SS(:,:,i))/U%hh
     END DO
   END SUBROUTINE

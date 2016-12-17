@@ -62,6 +62,7 @@ FF, GG, SS, xc)
   U%eta = 0.0_dp; U%deta = 0.0_dp; U%du = 0.0_dp
   bed%hc = 0.0_dp; bed%dz = 0.0_dp
   U%etap = 0.0_dp; U%up = 0.0_dp
+  FF = 0.0_dp; GG = 0.0_dp; SS = 0.0_dp
   ! Inicializamos el lecho del sistema
   CALL initial_elev(bed%elev)
   ! Calculamos alturas centrales y pendientes
