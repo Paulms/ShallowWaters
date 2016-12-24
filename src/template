@@ -3,7 +3,7 @@ CC = gcc
 LD = gfortran
 
 LIBS= #-L/usr/local/lib -lsuperlu -lopenblas /usr/local/lib/libpardiso500-GNU481-X86-64.so -L/usr/local/lib -lskit
-#FFLAGS =  -g -fopenmp -ffree-line-length-0 -W -Wall -fbounds-check -pedantic-errors -Wunderflow -O -fbacktrace -ffpe-trap=zero,overflow,underflow
+FFLAGS =  -g -fopenmp #-ffree-line-length-0 -W -Wall -fbounds-check -pedantic-errors -Wunderflow -O -fbacktrace -ffpe-trap=zero,overflow,underflow
 #Opimizacion
 #FFLAGS = -fopenmp -ffast-math -funroll-loops –param max-unroll-times=2 -Ofast -march=native
 #ifort:

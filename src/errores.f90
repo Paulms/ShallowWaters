@@ -1,10 +1,12 @@
 MODULE errores
+! Modulo para la estimación de errores
 USE decimal
 USE funciones
 USE quadrature
 IMPLICIT NONE
 CONTAINS
     SUBROUTINE calcular_errores(xx, U, h, tt, NormaL2Err, ejemplo)
+        ! Calcula errores en norma L2, utilizando una cuadratura de Gauss
         REAL(kind=dp), INTENT(in)   :: xx(:)          ! malla
         TYPE(SWSolution)            :: U              ! solucion numérica
         INTEGER, INTENT (in)        :: ejemplo

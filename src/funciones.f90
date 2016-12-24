@@ -43,6 +43,7 @@ CONTAINS
       STOP
     END SELECT
   END SUBROUTINE
+  
   SUBROUTINE exact_sol_vec(xx, tt, hh, uu, ejemplo)
     ! Solucion exacta como vector
     REAL(kind = dp)     :: xx(:)      ! malla

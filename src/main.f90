@@ -2,6 +2,7 @@ PROGRAM ShallowWaters
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !! Programa para resolver ecuaciones de aguas           !!
   !! Superficiales utilizando volúmenes finitos           !!
+  !! en 1D y 2D                                           !!
   !!                                                      !!
   !!                                                      !!
   !! Autor: Paul Mendez Silva                             !!

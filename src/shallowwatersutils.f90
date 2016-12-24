@@ -6,6 +6,7 @@ MODULE shallowWatersUtils
 CONTAINS
 SUBROUTINE setupInitialConditions(ejemplo, dims, cellsize, cellnumber, U, bed,& 
 FF, GG, SS, xc)
+  ! Rutina para configurar los parámetros iniciales del problema
   REAL(kind = dp)                 :: cellsize       !Tamaño de celda
   INTEGER                         :: cellnumber     !numero de celdas
   INTEGER                         :: ednum          ! numero de bordes
@@ -172,6 +173,7 @@ SUBROUTINE limit(dvec, df1,df2, method)
 END SUBROUTINE
 
 SUBROUTINE predictor(U, bed, dt, dx)
+  ! Predictor for second order method
   TYPE(SWBed)                     :: bed            ! lecho
   TYPE(SWSolution)                :: U              !solucion
   REAL(kind=dp)                   :: dt, dx
