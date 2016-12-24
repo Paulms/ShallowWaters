@@ -70,7 +70,6 @@ CONTAINS
     REAL(kind = dp)     :: uu     ! velocidades
     REAL(kind = dp)     :: ss
     REAL(kind = dp)     :: hr, hl, u2, c2, xc
-    INTEGER             :: nc, center, i
     ! Inicializamos
     ss = 9.8143
     hl = 10.0_dp
