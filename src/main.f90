@@ -20,6 +20,7 @@ PROGRAM ShallowWaters
   USE plot                  ! Almacenar archivos para graficos
   USE ShallowWatersUtils
   USE datos                 ! Leer datos
+  USE errores
 
   IMPLICIT NONE
   ! Definimos variables a utilizar
@@ -44,6 +45,7 @@ PROGRAM ShallowWaters
   INTEGER                         :: limMethod       ! Method for flux limiter
   INTEGER                         :: errors          ! estimar errores 0 no 1 si
   REAL(kind=dp), ALLOCATABLE      :: Hexact(:,:), Uexact(:,:,:)
+  REAL (kind=dp)      :: NormaL2Err
 
   ! Inicializamos las variables
   cellsize = 0.0_dp; cellnumber = 0
@@ -65,7 +67,7 @@ PROGRAM ShallowWaters
   Uexact = 0.0_dp; Hexact = 0.0_dp
   ! Guardamos condicion inicial
   if (errors == 1) THEN
-    CALL exact_sol(xc, 0.0_dp, Hexact, Uexact, ejemplo)
+    CALL exact_sol_vec(xc, 0.0_dp, Hexact, Uexact, ejemplo)
   end if
   CALL plot_results(U, bed, xc, name, 0, Hexact, Uexact)
   ! Calculamos estado del sistema en cada paso de tiempo
@@ -99,10 +101,15 @@ PROGRAM ShallowWaters
       CALL corrector(U, FF,GG,SS,cellnumber,dt,cellsize)
       U%eta=U%hh+bed%hc
       if (errors == 1) THEN
-        CALL exact_sol(xc, tt, Hexact, Uexact, ejemplo)
+        CALL exact_sol_vec(xc, tt, Hexact, Uexact, ejemplo)
       end if
       CALL plot_results(U, bed, xc, name, tstep, Hexact, Uexact)
   END DO
+  IF (errors == 1) THEN
+    ! Estimamos error
+    CALL calcular_errores(xc, U, cellsize, tt, NormaL2Err, ejemplo)
+    print *,"Estimación error L2 (Altura): ", NormaL2Err
+  END IF
   ! Liberamos memoria
   DEALLOCATE(FF,GG, U%hh, U%uu, U%eta, U%deta, U%du, U%etap, U%up, U%uh)
   DEALLOCATE(bed%elev, bed%hc, bed%dz)

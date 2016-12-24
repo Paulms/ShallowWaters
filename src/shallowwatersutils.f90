@@ -28,8 +28,8 @@ FF, GG, SS, xc)
   END IF
   ednum = cellnumber + 1
   ! Creamos una malla uniforme
-  ALLOCATE(xc(cellnumber-1))
-  xc = (/(cellsize/2 + i*cellsize,i=1,cellnumber-1)/)
+  ALLOCATE(xc(cellnumber))
+  xc = (/(cellsize/2 + i*cellsize,i=0,cellnumber-1)/)
 
   ! Ajustamos problema a las dimensiones
   SELECT CASE (dims)

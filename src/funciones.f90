@@ -17,32 +17,57 @@ CONTAINS
     REAL(kind=dp)                :: elevacion(:,:)  
     elevacion = 0.1_dp
   END SUBROUTINE
-  SUBROUTINE exact_sol(xx, tt, hh, uu, ejemplo)
+  SUBROUTINE exact_sol(pto, tt, xx, hh, uu, ejemplo)
     ! Editar el caso 0 de esta funcion para calcular errores
     REAL(kind = dp)     :: xx(:)      ! malla
     REAL(kind = dp)     :: tt         ! tiempo
-    REAL(kind = dp)     :: hh(:,:)    ! profundidad
-    REAL(kind = dp)     :: uu(:,:,:)  ! velocidades
+    REAL(kind = dp)     :: pto(2)     ! pto
+    REAL(kind = dp)     :: hh    ! profundidad
+    REAL(kind = dp)     :: uu(:)  ! velocidades
     INTEGER             :: ejemplo    ! ejemplo a usar
+    REAL(kind = dp)     :: xc
+    INTEGER             :: center
+    ! Inicializamos
+    hh = 0.0
+    uu = 0.0
     SELECT CASE (ejemplo)
     CASE(0)
         hh = 0.0
         uu = 0.0
     CASE(1)
-      CALL exact_sol_ejemplo1(xx, tt, hh, uu)
+      center = INT(SIZE(xx,1)/2)
+      xc = (xx(center)+xx(center+1))/2
+      CALL exact_sol_ejemplo1(pto(1), tt, xc, hh, uu(1))
     CASE DEFAULT
       PRINT *, "No se conoce la solución exacta para este caso"
       STOP
     END SELECT
   END SUBROUTINE
-
-  SUBROUTINE exact_sol_ejemplo1(xx, tt, hh, uu)
-    ! Solución exacta para el problema del
-    ! ejercicio 1
+  SUBROUTINE exact_sol_vec(xx, tt, hh, uu, ejemplo)
+    ! Solucion exacta como vector
     REAL(kind = dp)     :: xx(:)      ! malla
     REAL(kind = dp)     :: tt         ! tiempo
     REAL(kind = dp)     :: hh(:,:)    ! profundidad
     REAL(kind = dp)     :: uu(:,:,:)  ! velocidades
+    INTEGER             :: ejemplo    ! ejemplo a usar
+    INTEGER             :: nf, nc
+    INTEGER             :: i,j     
+    nf = size(hh,1)
+    nc = size(hh,2)
+    DO i = 1, nf
+      DO j = 1,nc
+        CALL exact_sol([xx(i), xx(j)], tt, xx, hh(i,j), uu(i,j,:), ejemplo)
+      END DO
+    END DO
+  END SUBROUTINE
+
+  SUBROUTINE exact_sol_ejemplo1(xx, tt, xc, hh, uu)
+    ! Solución exacta para el problema del
+    ! ejercicio 1
+    REAL(kind = dp)     :: xx      ! malla
+    REAL(kind = dp)     :: tt         ! tiempo
+    REAL(kind = dp)     :: hh    ! profundidad
+    REAL(kind = dp)     :: uu     ! velocidades
     REAL(kind = dp)     :: ss
     REAL(kind = dp)     :: hr, hl, u2, c2, xc
     INTEGER             :: nc, center, i
@@ -50,29 +75,24 @@ CONTAINS
     ss = 9.8143
     hl = 10.0_dp
     hr = 1.0_dp
-    nc = size(hh,1)
 
     ! Calculamos la solucion
-    center = INT(SIZE(xx,1)/2)
-    xc = (xx(center)+xx(center+1))/2
     u2 = ss - (grav*hr)/(4.0*ss)*(1+sqrt(1+(8.0*ss**2)/(grav*hr)))
     c2 = sqrt((grav*hr)/2.0*(sqrt(1+(8.0*ss**2)/(grav*hr))-1))
 
-    DO i=1,nc
-      if (xx(i) < (-tt*sqrt(grav*hl) + xc)) THEN
-        hh(i,1)=hl
-        uu(i,1,1)=0.0_dp
-      else if (xx(i) >= -tt*sqrt(grav*hl)+xc .AND. xx(i) <= (u2 - c2)*tt+xc) THEN
-        hh(i,1)=1/(9*grav)*(2*sqrt(grav*hl) - 1/(tt)*(xx(i)-xc))**2
-        uu(i,1,1)=1/(3*tt)*(2*(xx(i)-xc)+2*tt*sqrt(grav*hl))
-      else if (xx(i) >= (u2 - c2)*tt + xc .AND. xx(i) <= ss*tt + xc) THEN
-        hh(i,1)=hr/2.0*(sqrt(1+(8.0*ss**2)/(grav*hr))-1)
-        uu(i,1,1)=u2
-      else if (xx(i) >= ss*tt+xc) THEN
-        hh(i,1)=hr
-        uu(i,1,1)=0.0_dp
-      end IF
-    END DO
+    IF (xx < (-tt*sqrt(grav*hl) + xc)) THEN
+      hh=hl
+      uu=0.0_dp
+    else if (xx >= -tt*sqrt(grav*hl)+xc .AND. xx <= (u2 - c2)*tt+xc) THEN
+      hh=1/(9*grav)*(2*sqrt(grav*hl) - 1/(tt)*(xx-xc))**2
+      uu=1/(3*tt)*(2*(xx-xc)+2*tt*sqrt(grav*hl))
+    else if (xx >= (u2 - c2)*tt + xc .AND. xx <= ss*tt + xc) THEN
+      hh=hr/2.0*(sqrt(1+(8.0*ss**2)/(grav*hr))-1)
+      uu=u2
+    else if (xx >= ss*tt+xc) THEN
+      hh=hr
+      uu=0.0_dp
+    end IF
   END SUBROUTINE
 
   SUBROUTINE initial_h_ejemplo1(altura)
