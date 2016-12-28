@@ -116,7 +116,7 @@ CONTAINS
   SUBROUTINE initial_h_ejemplo3(altura)
     ! Condiciones iniciales del ejemplo 3
     ! Rotura de presa 2D con una gaussiana en medio
-    ! El ejemplo requiere una malla de 5 celdas o más
+    ! El ejemplo requiere una malla de midsize celdas o más
     REAL(kind=dp)                   :: altura(:,:)  
     REAL(kind = dp), ALLOCATABLE    :: drop(:,:)
     INTEGER                         :: i,j,center, midsize
