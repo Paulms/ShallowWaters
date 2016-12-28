@@ -10,12 +10,12 @@ CONTAINS
     REAL(kind=dp)                :: elevacion(:,:) 
     elevacion = 0.0_dp
   END SUBROUTINE
-  SUBROUTINE initial_h(elevacion)
+  SUBROUTINE initial_h(altura)
     ! Editar esta función para imponer
     ! una condición inicial a la elevacion del agua
     ! contando con el lecho
-    REAL(kind=dp)                :: elevacion(:,:)  
-    elevacion = 0.1_dp
+    REAL(kind=dp)                :: altura(:,:)  
+    altura = 0.1_dp
   END SUBROUTINE
   SUBROUTINE exact_sol(pto, tt, xx, hh, uu, ejemplo)
     ! Editar el caso 0 de esta funcion para calcular errores
@@ -119,15 +119,16 @@ CONTAINS
     ! El ejemplo requiere una malla de 5 celdas o más
     REAL(kind=dp)                   :: altura(:,:)  
     REAL(kind = dp), ALLOCATABLE    :: drop(:,:)
-    INTEGER                         :: i,j,center
+    INTEGER                         :: i,j,center, midsize
     altura = 0.1_dp
-    ALLOCATE(drop(5,5))
-    DO i = 1,5
-      drop(i,:) = (/(2*exp(-0.25*((i-3)**2+j**2)), j = -2, 2)/)
+    midsize = 9
+    ALLOCATE(drop(midsize*2+1,midsize*2+1))
+    DO i = 1,midsize*2+1
+      drop(i,:) = (/(4*exp(-0.25*((i-midsize-1)**2+j**2)), j = -midsize, midsize)/)
     END DO
     center = INT(SIZE(altura,1)/2)
-    altura((center-2):(center+2),(center-2):(center+2)) = &
-    altura((center-2):(center+2),(center-2):(center+2)) + drop
+    altura((center-midsize):(center+midsize),(center-midsize):(center+midsize)) = &
+    altura((center-midsize):(center+midsize),(center-midsize):(center+midsize)) + drop
     DEALLOCATE(drop)
   END SUBROUTINE
 

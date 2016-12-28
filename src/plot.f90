@@ -93,21 +93,13 @@ CONTAINS
       END DO
     END DO
     !
-    WRITE(iunit1,'(A)')'SCALARS VelocidadX float  1'
-    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    WRITE(iunit1,'(A)')'VECTORS Velocidad float'
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') U%uu(j,i,1)
+        WRITE(iunit1,'(3(F22.15,2x))') U%uu(j,i,1), U%uu(j,i,2), 0.0
       END DO
     END DO
     !
-    WRITE(iunit1,'(A)')'SCALARS VelocidadY float  1'
-    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
-    DO j=1,size(x,1)
-      DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') U%uu(j,i,2)
-      END DO
-    END DO
     WRITE(iunit1,'(A)')'SCALARS ElevacionLecho float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
@@ -124,21 +116,13 @@ CONTAINS
       END DO
     END DO
     !
-    WRITE(iunit1,'(A)')'SCALARS VelocidadXExact float  1'
-    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
+    WRITE(iunit1,'(A)')'VECTORS VelocidadExact float'
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') Uexact(j,i,1)
+        WRITE(iunit1,'(3(F22.15,2x))') Uexact(j,i,1), Uexact(j,i,2), 0.0
       END DO
     END DO
     !
-    WRITE(iunit1,'(A)')'SCALARS VelocidadYExact float  1'
-    WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
-    DO j=1,size(x,1)
-      DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') Uexact(j,i,2)
-      END DO
-    END DO
     CLOSE(iunit1)
     !
   END SUBROUTINE plot_paraview2D
