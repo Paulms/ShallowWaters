@@ -40,7 +40,7 @@ PROGRAM ShallowWaters
   CHARACTER(LEN=32)               :: name           ! Archivo para guardar resp
   REAL(kind = dp)                 :: amax           ! Para calculo de CFL
   INTEGER                         :: dims           ! dimensiones del problema
-  INTEGER                         :: ejemplo        ! 1 agua desde la esquina, 2 gota de agua
+  INTEGER                         :: ejemplo        ! 1 dambreak 1D, 2 dambreak 2D, 3 circular
   CHARACTER(32)                   :: file_input_name ! Archivo para leer datos
   INTEGER                         :: order           ! orden del esquema
   INTEGER                         :: limMethod       ! Method for flux limiter
