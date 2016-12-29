@@ -50,14 +50,17 @@ CONTAINS
     REAL(kind = dp)     :: tt         ! tiempo
     REAL(kind = dp)     :: hh(:,:)    ! profundidad
     REAL(kind = dp)     :: uu(:,:,:)  ! velocidades
+    REAL(kind = dp)     :: point(2)   ! coordenadas
     INTEGER             :: ejemplo    ! ejemplo a usar
     INTEGER             :: nf, nc
-    INTEGER             :: i,j     
+    INTEGER             :: i,j
+    point = 0.0_dp     
     nf = size(hh,1)
     nc = size(hh,2)
     DO i = 1, nf
       DO j = 1,nc
-        CALL exact_sol([xx(i), xx(j)], tt, xx, hh(i,j), uu(i,j,:), ejemplo)
+        point = [xx(i), xx(j)]
+        CALL exact_sol(point, tt, xx, hh(i,j), uu(i,j,:), ejemplo)
       END DO
     END DO
   END SUBROUTINE

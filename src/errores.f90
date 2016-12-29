@@ -18,9 +18,9 @@ CONTAINS
         REAL (kind=dp)      :: hh, uu(2)
         INTEGER             :: i, j, k, l, ipoints
         REAL (kind=dp), ALLOCATABLE :: w(:), points(:,:)
-        REAL (kind=dp)      :: tt                     ! tiempo
+        REAL (kind=dp)      :: tt, point(2)                     ! tiempo
         ! Inicializamos variables
-        uu = 0.0_dp
+        uu = 0.0_dp; point = 0.0_dp
         SELECT CASE (U%dims)
         CASE (1)
             ipoints = 5
@@ -34,7 +34,8 @@ CONTAINS
                 xi=xx(i)
                 DO j = 1, ipoints
                     xi = xi_l + h/2*(1+points(j,1))
-                    CALL exact_sol([xi,0.0_dp], tt, xx, hh, uu, ejemplo)
+                    point = [xi,0.0_dp]
+                    CALL exact_sol(point, tt, xx, hh, uu, ejemplo)
                     normaL2cuad=normaL2cuad+h/2*w(j)*(hh - U%eta(i,1))
                 END DO
             END DO

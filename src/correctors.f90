@@ -15,8 +15,10 @@ CONTAINS
       U%hh=U%hh-dt/dx*(GG(:,2:n+1,1)-GG(:,1:n,1))
     END IF
     DO i = 1, U%dims
-      U%uh(:,:,i)=(U%uh(:,:,i)-dt/dx*(FF(2:n+1,:,i+1)-FF(1:n,:,i+1)+GG(:,2:n+1,i+1)-&
-      GG(:,1:n,i+1))-dt*SS(:,:,i))
+      U%uh(:,:,i)=U%uh(:,:,i)-dt*SS(:,:,i)-dt/dx*(FF(2:n+1,:,i+1)-FF(1:n,:,i+1))
+      IF (U%dims == 2) THEN
+        U%uh(:,:,i)=U%uh(:,:,i)-dt/dx*(GG(:,2:n+1,i+1)-GG(:,1:n,i+1))
+      END IF
       U%uu(:,:,i) = U%uh(:,:,i)/U%hh
     END DO
   END SUBROUTINE
