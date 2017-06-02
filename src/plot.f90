@@ -74,7 +74,7 @@ CONTAINS
     !
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(3(E30.15,2x))') x(j),y(i),0.0
+        WRITE(iunit1,'(3(F30.15,2x))') x(j),y(i),0.0
       END DO
     END DO
     !
@@ -89,7 +89,7 @@ CONTAINS
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') U%eta(j,i)
+        WRITE(iunit1,'(F30.15)') U%eta(j,i)
       END DO
     END DO
     !
@@ -104,7 +104,7 @@ CONTAINS
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') bed%elev(j,i)
+        WRITE(iunit1,'(F30.15)') bed%elev(j,i)
       END DO
     END DO
     ! Almacenamos soluciones exactas
@@ -112,7 +112,7 @@ CONTAINS
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
       DO i = 1,size(y,1)
-        WRITE(iunit1,'(E30.15)') Hexact(j,i)
+        WRITE(iunit1,'(F30.15)') Hexact(j,i)
       END DO
     END DO
     !
@@ -162,7 +162,7 @@ CONTAINS
     WRITE(iunit1,'(A,1x,i12,1x,A)')'POINTS',nod,'float'
     !
     DO i = 1,size(x,1)
-      WRITE(iunit1,'(3(E30.15,2x))') x(i),0.0,0.0
+      WRITE(iunit1,'(3(F30.15,2x))') x(i),0.0,0.0
     END DO
     !
     ! Las variables calculadas:
@@ -175,31 +175,31 @@ CONTAINS
     WRITE(iunit1,'(A)')'SCALARS AlturaAgua float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
-        WRITE(iunit1,'(E30.15)') U%eta(j,1)
+        WRITE(iunit1,'(F30.15)') U%eta(j,1)
     END DO
     !
     WRITE(iunit1,'(A)')'SCALARS VelocidadX float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
-        WRITE(iunit1,'(E30.15)') U%uu(j,1,1)
+        WRITE(iunit1,'(F30.15)') U%uu(j,1,1)
     END DO
     !
     WRITE(iunit1,'(A)')'SCALARS ElevacionLecho float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
-        WRITE(iunit1,'(E30.15)') bed%elev(j,1)
+        WRITE(iunit1,'(F30.15)') bed%elev(j,1)
     END DO
     ! Almacenamos soluciones exactas
         WRITE(iunit1,'(A)')'SCALARS AlturaAguaExact float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
-        WRITE(iunit1,'(E30.15)') Hexact(j,1)
+        WRITE(iunit1,'(F30.15)') Hexact(j,1)
     END DO
     !
     WRITE(iunit1,'(A)')'SCALARS VelocidadXExact float  1'
     WRITE(iunit1,'(A)')'LOOKUP_TABLE default'
     DO j=1,size(x,1)
-        WRITE(iunit1,'(E30.15)') Uexact(j,1,1)
+        WRITE(iunit1,'(F30.15)') Uexact(j,1,1)
     END DO
     CLOSE(iunit1)
   END SUBROUTINE plot_paraview1D
