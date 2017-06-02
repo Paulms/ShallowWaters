@@ -33,7 +33,7 @@ CONTAINS
     END IF
     chat=(0.5*grav*(hl+hr))**0.5;
     ! Delta de las variables características: v_techo
-    if (chat /= 0) THEN
+    if (abs(chat) > 0.0_dp) THEN
     dW(1) = 0.5*((hr-hl)-hhat*((ur-ul)*normal(2)+(vr-vl)*normal(1))/chat)
     dw(3) = 0.5*(hr-hl+hhat*((ur-ul)*normal(2)+(vr-vl)*normal(1))/chat)
     END IF
